@@ -1,0 +1,102 @@
+.AuthoContainer{
+	width:780px;
+	height:890px;
+	padding:40px;
+	padding-right:20px;
+
+	overflow:hidden;
+
+	border:1px white solid;
+	
+
+	font-size:21px;
+	color:white;
+	text-align: left;
+	margin:0;
+}
+.AuthoText{
+	overflow-y:scroll;
+	padding-right:40px;
+	height:100%;
+}
+.AuthoText>p{
+	margin-top:0px;
+	margin-bottom: 20px;
+}
+.AuthoTitle{
+	font-size:24px;
+	font-weight: bold;
+}
+
+#_watch_qrcode_container{
+	position:absolute;
+	bottom:265px;	
+	width:180px;
+	height:180px;
+	background-image: url('../../asset/img/btn/qrcode-06.png');
+}
+#_watch_qrcode{
+	position: absolute;
+	left:45px;
+	bottom:15px;
+	
+	width:80px;
+	height:80px;	
+
+	padding:5px;
+	background-color: white;
+}
+#_button_make_record{
+	position: absolute;
+	bottom:120px;
+}
+
+#_record_ready_countdown{
+	font-size: 143px;
+	color:white;
+}
+#_record_countdown{
+	font-size: 36px;
+	color:white;
+	position: absolute;
+	top:40px;
+	right:40px;
+}
+
+#_record_qrcode{
+	position: absolute;
+	top:730px;
+	left:420px;
+	
+	width:180px;
+	height:180px;
+
+	padding: 20px;
+	background-color: white;
+
+}
+#_record_code{
+	position: absolute;
+	
+	left:598px;
+	top:627px;
+
+	width:220px;
+	height:50px;
+
+	font-size: 56px;
+	color:white;
+}
+
+#_loading_text{
+	font-size:36px;
+	color:white;
+}
+#_loading_percent{
+	font-size:48px;
+}
+/*#_back_loading{
+	width: 100%;
+	height: 100%;
+	background-image: url('../../asset/seq/Downloading/downloading_00000.png');
+}*/

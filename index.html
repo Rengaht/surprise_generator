@@ -2,74 +2,104 @@
 <head>
 	<meta charset="utf-8">
 	
-	<link rel="stylesheet" type="text/css" href="css/page.css">
-	<link rel="stylesheet" type="text/css" href="css/content.css">
-	<script src="js/page.js"></script>
+	<link rel="stylesheet" type="text/css" href="src/css/page.css">
+	<link rel="stylesheet" type="text/css" href="src/css/content.css">
+	<link rel="stylesheet" type="text/css" href="src/css/count.css">
+	<script src="src/lib/qrcode.js"> </script>
+	<script src="src/js/record.js"></script>
+	<script src="src/js/page.js"></script>
 
-	<script src="src/jquery-3.3.1.min.js"> </script>
-	<script src='src/spritespin.js' type='text/javascript'></script>
+	
+	<script src="src/lib/jquery-3.3.1.min.js"> </script>
+	<script src='src/lib/spritespin.js' type='text/javascript'></script>
 </head>
 <body>
+	 <!-- <iframe src="asset/sound/silence.mp3" allow="autoplay" id="_audio" style="display:none"></iframe> -->
+	<audio id="_sound_bgm" autoplay loop>
+    		<source src="asset/sound/Rainbow_Forest.mp3" type="audio/mp3">
+	</audio>
+	<audio id="_sound_count">
+    	<source src="asset/sound/count.wav" type="audio/mp3">
+	</audio>
+	<audio id="_sound_click">
+    	<source src="asset/sound/check.wav" type="audio/mp3">
+	</audio>
+	<audio id="_sound_finish">
+    	<source src="asset/sound/result.mp3" type="audio/mp3">
+	</audio>
+ 
 	<div id="_back_image_big" class="BackGround" >
 		<div id="_back_loop_big"></div>
-		<img src='img/home_layout-01.png'/>
+		<img src='asset/img/home_layout-01.png'/>
 	</div>	
 	<div id="_back_image_small" class="BackGround hidden">
 		<div id='_back_loop_small'></div>
-		<img src='img/home_layout-02.png'/>
+		<img src='asset/img/home_layout-02.png'/>
+	</div>
+	<div id="_back_image_loading" class="BackGround hidden">
+		<div id='_back_loading'></div>
+		<img src='asset/img/home_layout-01.png'/>
 	</div>
 	
 	<div class="HomeButton" id="_home_button">
-		<img src="img/title/img-02.png" onClick="homeClicked()"/>
+		<img src="asset/img/title/img-02.png" onClick="homeClicked()"/>
 	</div>
 	<div class="Container" id="_page_home">
 		<div class="Row" style="margin-top:260px">
-			<img class="CenterItem Title" src="img/title/img-01.png"/>
+			<img class="CenterItem Title" src="asset/img/title/img-01.png"/>
 		</div>
 		<div class="Row" style="margin-top:100px">
-			<img class="CenterItem Text" src="img/text/img-01.png"/>
+			<img class="CenterItem Text" src="asset/img/text/img-01.png"/>
 		</div>
 		<div class="Row" style="margin-top:120px">
 			<div class="CenterItem">
-				<img class="Button" src="img/btn/btn-01.png" onClick="goPage('_page_record_autho')"/>
-				<img class="Button" src="img/btn/btn-02.png" onClick="goPage('_page_watch_code')"/>
+				<img class="Button" src="asset/img/btn/btn-01.png" onClick="goPage('_page_record_autho')"/>
+				<img class="Button" src="asset/img/btn/btn-02.png" onClick="goPage('_page_watch_code')"/>
 			</div>
 		</div>		
 	</div>
 	<div class="Container hidden" id="_page_watch_code">		
 		<div class="Row" style="margin-top:535px">
-			<img class="CenterItem Text" src="img/text/img-02.png"/>
+			<img class="CenterItem Text" src="asset/img/text/img-02.png"/>
 		</div>
 		<div class="Row" style="margin-top:80px">
 			<input class="CenterItem" type="text" id="_input_watch_code" placeholder="請輸入六位數序號" maxlength="6"/>
 		</div>
 		<div class="Row" style="margin-top:115px">
-			<img class="CenterItem Button" src="img/btn/img-03.png" onClick="goPage('_page_watch_loading')"/>	
+			<img class="CenterItem Button" src="asset/img/btn/img-03.png" onClick="loadVideo()"/>	
 		</div>		
 	</div>
 	<div class="Container hidden" id="_page_watch_loading">		
 		<div class="Row" style="margin-top:465px">
-			<img class="CenterItem Text" src="img/text/img-04.png"/>
+			<img class="CenterItem Text" src="asset/img/text/img-04.png"/>
+		</div>
+		<div class="Row" style="margin-top:340px">
+			<div class="CenterItem hidden" id="_loading_text">
+				<span id="_loading_percent"></span>
+				<span>%</span>
+			</div>
 		</div>		
 	</div>
 	<div class="Container hidden" id="_page_watch_video">		
 		<div class="Row" style="margin-top:370px">
-			<div class="CenterItem VideoFrame" >
-				<div class="VideoAcc Container">
+			<div class="CenterItem VideoContainer" >
+				<video class="VideoFrame" id="_video_watching" preload="auto" autoplay controls></video>
+				<div class="VideoAcc Container hidden" id="_watch_finish_button">
 					<div class="CenterItem" id="_watch_qrcode_container">
 						<div id="_watch_qrcode"></div>
 					</div>
-					<img class="CenterItem Button" src="img/btn/img-06.png" onClick="goPage('_page_record_autho')" id="_button_make_record"/>					
+					<img class="CenterItem Button" src="asset/img/btn/img-06.png" onClick="goPage('_page_record_autho')" id="_button_make_record"/>					
 				</div>
 			</div>
 		</div>		
 	</div>
 	<div class="Container hidden" id="_page_record_autho">	
 		<div class="Row" style="margin-top:400px">
-			<img class="CenterItem Text" src="img/text/img-07.png"/>
+			<img class="CenterItem Text" src="asset/img/text/img-07.png"/>
 		</div>
 		<div class="Row" style="margin-top:35px">
-			<div class="CenterItem AuthoText">
+			<div class="CenterItem AuthoContainer">
+				<div class="AuthoText">
 				<p class="AuthoTitle">一、蒐集個人資料告知事項</p>
     <p>本活動「驚喜生成器」係由誠品生活股份有限公司(下稱主辦單位)主辦，為遵守個人資料保護法之規定，在參加人提供個人資料予主辦單位前，謹依法告知下列事項：</p>
  <p>(一)為供參加人使用本活動機台錄製影像短片並通知他人前來觀看，以及供主辦單位挑選影像短片公開上傳至相關網頁之本活動目的，本活動機台使用時將獲取並儲存參加人提供之個人資料(包括但不限於姓名、肖像、聲音以及一切參加人輸入機台之資訊)。</p>
@@ -90,30 +120,34 @@
 <p class="AuthoTitle">四、參加人確出於自願參加本次由主辦單位舉辦之本活動，一旦點擊確認連結後即視同已詳細閱讀、並同意上述條款及主辦單位所發布之本活動相關說明及規定。</p>
 			</div>
 		</div>
+		</div>
 		<div class="Row" style="margin-top:50px">
 			<div class="CenterItem">
-				<img class="Button" src="img/btn/btn-07.png" onClick="goPage('_page_home')"/>
-				<img class="Button" src="img/btn/btn-08.png" onClick="goPage('_page_record_video')"/>
+				<img class="Button" src="asset/img/btn/btn-07.png" onClick="goPage('_page_home')"/>
+				<img class="Button" src="asset/img/btn/btn-08.png" onClick="goPage('_page_record_video')"/>
 			</div>
 		</div>		
 	</div>
-	<div class="Container hidden" id="_page_record_video">		
+	<div class="Container " id="_page_record_video">		
 		<div class="Row" style="margin-top:370px">
-			<div class="CenterItem VideoFrame">
+			<div class="CenterItem VideoContainer">
+				<video class="VideoFrame" id="_video_recording" autoplay></video>
+				<video class="VideoFrame" id="_video_preview" controls autoplay></video>
+
 				<div class="VideoAcc Container" id="_acc_ready">
-					<img id="_acc_camera" src="img/acc/img-08.png" style="position:absolute;top:40px;left:40px"/>
-					<div class="CenterItem" id="_record_ready_countdown" style="margin-top:480px"></div>
-					<img class="CenterItem" src="img/text/img-08.png" style="margin-top:80px"/>			
+					<img id="_acc_camera" src="asset/img/acc/img-08.png" style="position:absolute;top:40px;left:40px"/>
+					<div class="CenterItem" id="_record_ready_countdown" style="margin-top:350px"></div>
+					<img class="CenterItem" src="asset/img/text/img-08.png" style="margin-top:80px"/>			
 				</div>
-				<div class="VideoAcc Container hidden" id="_acc_recording">
-					<img id="_acc_recording" src="img/acc/img-09.png" style="position:absolute;top:40px;left:40px"/>
-					<div id="_record_countdown"></div>
+				<div class="VideoAcc Container " id="_acc_recording">
+					<img id="_acc_recording" src="asset/img/acc/img-09.png" style="position:absolute;top:40px;left:40px"/>
+					<div id="_record_countdown" class="lds-ring"><div></div></div>
 				</div>
 				<div class="VideoAcc Container hidden" id="_acc_preview"">
-					<img src="img/acc/img-10.png" style="position:absolute;top:40px;left:40px"/>
+					<img src="asset/img/acc/img-10.png" style="position:absolute;top:40px;left:40px"/>
 					<div class="Row" style="margin-top:980px">`
-						<img class="Button" src="img/btn/btn-10.png" onClick="recordAgain()"/>
-						<img class="Button" src="img/btn/btn-11.png" onClick="goPage('_page_send')"/>
+						<img class="Button" src="asset/img/btn/btn-10.png" onClick="recordAgain()"/>
+						<img class="Button" src="asset/img/btn/btn-11.png" onClick="goPage('_page_send')"/>
 					</div>
 				</div>
 			</div>			
@@ -121,7 +155,7 @@
 	</div>
 	<div class="Container hidden" id="_page_send">		
 		<div class="Row" style="margin-top:440px">
-			<img class="CenterItem" src="img/text/img-11.png"/>
+			<img class="CenterItem" src="asset/img/text/img-11.png"/>
 		</div>
 		<div class="Row" style="margin-top:80px">	
 			<input class="CenterItem" type="text" id="_input_send_name" placeholder="請輸入他的名字" />
@@ -130,21 +164,24 @@
 			<input class="CenterItem" type="text" id="_input_send_phone" placeholder="請輸入他的手機號碼 *僅限台灣本島" />
 		</div>
 		<div class="Row" style="margin-top:115px">		
-			<img class="Button" src="img/btn/img-12.png" onClick="sendSurprise()"/>
+			<img class="Button" src="asset/img/btn/img-12.png" onClick="sendSurprise()"/>
 		</div>
 	</div>
 	<div class="Container hidden" id="_page_send_success">		
 		<div class="Row" style="margin-top:340px">
-			<img class="CenterItem" src="img/text/img-13.png"/>
+			<img class="CenterItem" src="asset/img/text/img-13.png"/>
 		</div>
+		<div id="_record_code"></div>
+		<div id="_record_qrcode"></div>
+		
 		<div class="Row" style="margin-top:70px">`
-			<img class="Button" src="img/btn/img-16.png" onClick="goPage('_page_home')"/>
-			<img class="Button" src="img/btn/img-15.png" onClick="goPage('_page_lottery')"/>
+			<img class="Button" src="asset/img/btn/img-16.png" onClick="goPage('_page_home')"/>
+			<img class="Button" src="asset/img/btn/img-15.png" onClick="goPage('_page_lottery')"/>
 		</div>
 	</div>
 	<div class="Container hidden" id="_page_lottery">		
 		<div class="Row" style="margin-top:400px">
-			<img class="CenterItem" src="img/text/img-14.png"/>
+			<img class="CenterItem" src="asset/img/text/img-14.png"/>
 		</div>
 		<div class="Row" style="margin-top:50px">
 			<input class="CenterItem" type="text" id="_input_lottery_name" placeholder="你的姓名" />
@@ -162,15 +199,15 @@
 			<input class="CenterItem" type="text" id="_input_lottery_phone" placeholder="手機號碼" />
 		</div>
 		<div class="Row" style="margin-top:80px">
-			<img class="Button" src="img/btn/img-15.png" onClick="goPage('_page_lottery_success')"/>
+			<img class="Button" src="asset/img/btn/img-15.png" onClick="sendTicketInfo()"/>
 		</div>
 	</div>
 	<div class="Container hidden" id="_page_lottery_success">		
 		<div class="Row" style="margin-top:425px">
-			<img class="CenterItem" src="img/text/img-16.png"/>
+			<img class="CenterItem" src="asset/img/text/img-16.png"/>
 		</div>
 		<div class="Row" style="margin-top:130px">
-			<img class="CenterItem Button" src="img/btn/img-16.png" onClick="goPage('_page_home')"/>
+			<img class="CenterItem Button" src="asset/img/btn/img-16.png" onClick="goPage('_page_home')"/>
 		</div>
 	</div>
 </body>
