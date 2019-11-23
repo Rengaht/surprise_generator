@@ -2,7 +2,7 @@ var preview;
 var recording;
 var recorder;
 
-let recordingTimeMS = 30000;
+let recordingTimeMS = 5000;
 var recordedBlob;
 
 function wait(delayInMS) {
@@ -33,10 +33,23 @@ function startStreamRecording(stream, lengthInMS){
 }
 
 function stop(stream){
-  stream.getTracks().forEach(track => track.stop());
+  if(stream!=null)
+    stream.getTracks().forEach(track => track.stop());
 }
 
 function requestCamera(){
+
+  showItem($('#_video_recording'));
+  hideItem($('#_video_preview'));
+
+  hideItem($('#_acc_recording'));
+  hideItem($('#_acc_preview'));
+  hideItem($('#_acc_ready'));
+
+  hideItem($('#_record_ready_countdown'));
+  hideItem($('#_record_ready_text'));
+
+
   const hdConstraints = {
     video: {width: {min: 1280}, height: {min: 960},aspectRatio:{ideal:1.33333}},
     audio: true
@@ -48,6 +61,16 @@ function requestCamera(){
     //downloadButton.href = stream;
     recording.captureStream = recording.captureStream || recording.mozCaptureStream;
     
+
+    
+    turnOffBgm();
+    setTimeout(function(){
+      showItem($('#_acc_ready'));
+    },HINT_DELAY);
+    setTimeout(function(){
+      startCountDown();
+    },HINT_DELAY+VIDEO_DELAY);
+
     return new Promise(resolve => recording.onplaying = resolve);
 
   }).catch(error=>{
@@ -70,6 +93,7 @@ function startVideoRecording(){
     
     console.log("Successfully recorded " + recordedBlob.size + " bytes of " +
         recordedBlob.type + " media.");
+    stopVideoRecording();
   })
   .catch(error=>{
     console.log(error);
@@ -78,6 +102,6 @@ function startVideoRecording(){
 
 function stopVideoRecording(){
   //recorder.stop();
-  //stop(recording.srcObject);
+  stop(recording.srcObject);
 
 }

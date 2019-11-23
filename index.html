@@ -32,11 +32,11 @@
 		<div id="_back_loop_big"></div>
 		<img src='asset/img/home_layout-01.png'/>
 	</div>	
-	<div id="_back_image_small" class="BackGround hidden">
+	<div id="_back_image_small" class="BackGround hidden close">
 		<div id='_back_loop_small'></div>
 		<img src='asset/img/home_layout-02.png'/>
 	</div>
-	<div id="_back_image_loading" class="BackGround hidden">
+	<div id="_back_image_loading" class="BackGround hidden close">
 		<div id='_back_loading'></div>
 		<img src='asset/img/home_layout-01.png'/>
 	</div>
@@ -58,7 +58,7 @@
 			</div>
 		</div>		
 	</div>
-	<div class="Container hidden" id="_page_watch_code">		
+	<div class="Container hidden close" id="_page_watch_code">		
 		<div class="Row" style="margin-top:535px">
 			<img class="CenterItem Text" src="asset/img/text/img-02.png"/>
 		</div>
@@ -69,22 +69,22 @@
 			<img class="CenterItem Button" src="asset/img/btn/img-03.png" onClick="loadVideo()"/>	
 		</div>		
 	</div>
-	<div class="Container hidden" id="_page_watch_loading">		
+	<div class="Container hidden close" id="_page_watch_loading">		
 		<div class="Row" style="margin-top:465px">
 			<img class="CenterItem Text" src="asset/img/text/img-04.png"/>
 		</div>
 		<div class="Row" style="margin-top:340px">
-			<div class="CenterItem hidden" id="_loading_text">
+			<div class="CenterItem hidden close" id="_loading_text">
 				<span id="_loading_percent"></span>
 				<span>%</span>
 			</div>
 		</div>		
 	</div>
-	<div class="Container hidden" id="_page_watch_video">		
+	<div class="Container hidden close" id="_page_watch_video">		
 		<div class="Row" style="margin-top:370px">
 			<div class="CenterItem VideoContainer" >
 				<video class="VideoFrame" id="_video_watching" preload="auto" autoplay controls></video>
-				<div class="VideoAcc Container hidden" id="_watch_finish_button">
+				<div class="VideoAcc Container hidden close" id="_watch_finish_button">
 					<div class="CenterItem" id="_watch_qrcode_container">
 						<div id="_watch_qrcode"></div>
 					</div>
@@ -93,7 +93,7 @@
 			</div>
 		</div>		
 	</div>
-	<div class="Container hidden" id="_page_record_autho">	
+	<div class="Container hidden close" id="_page_record_autho">	
 		<div class="Row" style="margin-top:400px">
 			<img class="CenterItem Text" src="asset/img/text/img-07.png"/>
 		</div>
@@ -128,30 +128,30 @@
 			</div>
 		</div>		
 	</div>
-	<div class="Container hidden" id="_page_record_video">		
+	<div class="Container hidden close" id="_page_record_video">		
 		<div class="Row" style="margin-top:370px">
 			<div class="CenterItem VideoContainer">
 				<video class="VideoFrame" id="_video_recording" autoplay></video>
 				<video class="VideoFrame" id="_video_preview" controls autoplay></video>
 
 				<div class="VideoAcc Container" id="_acc_ready">
-					<img id="_acc_camera" src="asset/img/acc/img-08.png" style="position:absolute;top:40px;left:40px"/>
-					<div class="CenterItem" id="_record_ready_countdown" style="margin-top:350px"></div>
-					<img class="CenterItem" src="asset/img/text/img-08.png" style="margin-top:80px"/>			
+					<img class="blink" id="_acc_camera" src="asset/img/acc/img-08.png" style="position:absolute;top:40px;left:40px"/>
+					<div class="CenterItem hidden close" id="_record_ready_countdown" style="margin-top:350px"></div>
+					<img class="CenterItem hidden close" id="_record_ready_text" src="asset/img/text/img-08.png" style="margin-top:80px"/>			
 				</div>
-				<div class="VideoAcc Container hidden" id="_acc_recording">
-					<img id="_acc_recording" src="asset/img/acc/img-09.png" style="position:absolute;top:40px;left:40px"/>			
+				<div class="VideoAcc Container hidden close" id="_acc_recording">
+					<img class="blink" id="_acc_recording" src="asset/img/acc/img-09.png" style="position:absolute;top:40px;left:40px"/>			
 					<div id="_record_countdown">
-					<div class="CountdownWrapper" data-anim="base wrapper">
-					  <div class="CountdownCircle" data-anim="base left"></div>
-					  <div class="CountdownCircle" data-anim="base right"></div>
-					 </div>
-					<div id="_record_countdown_number">30s</div>		  
+						<div class="CountdownWrapper Anim" id="_circle_countdown_wrapper" data-anim="base wrapper">
+						  <div class="CountdownCircle LeftAnim" id="_circle_countdown_left" data-anim="base left"></div>
+						  <div class="CountdownCircle RightAnim" id="_circle_countdown_right" data-anim="base right"></div>
+						 </div>
+						<div id="_record_countdown_number">30s</div>		  
 					</div>
 				</div>
-				<div class="VideoAcc Container hidden" id="_acc_preview"">
-					<img src="asset/img/acc/img-10.png" style="position:absolute;top:40px;left:40px"/>
-					<div class="Row" style="margin-top:980px">`
+				<div class="VideoAcc Container hidden close" id="_acc_preview"">
+					<img class="blink" src="asset/img/acc/img-10.png" style="position:absolute;top:40px;left:40px"/>
+					<div class="Row hidden close" id="_record_finish_button" style="margin-top:980px;z-index: 20">`
 						<img class="Button" src="asset/img/btn/btn-10.png" onClick="recordAgain()"/>
 						<img class="Button" src="asset/img/btn/btn-11.png" onClick="goPage('_page_send')"/>
 					</div>
@@ -159,7 +159,7 @@
 			</div>			
 		</div>		
 	</div>
-	<div class="Container hidden" id="_page_send">		
+	<div class="Container hidden close" id="_page_send">		
 		<div class="Row" style="margin-top:440px">
 			<img class="CenterItem" src="asset/img/text/img-11.png"/>
 		</div>
@@ -173,7 +173,7 @@
 			<img class="Button" src="asset/img/btn/img-12.png" onClick="sendSurprise()"/>
 		</div>
 	</div>
-	<div class="Container hidden" id="_page_send_success">		
+	<div class="Container hidden close" id="_page_send_success">		
 		<div class="Row" style="margin-top:340px">
 			<img class="CenterItem" src="asset/img/text/img-13.png"/>
 		</div>
@@ -185,7 +185,7 @@
 			<img class="Button" src="asset/img/btn/img-15.png" onClick="goPage('_page_lottery')"/>
 		</div>
 	</div>
-	<div class="Container hidden" id="_page_lottery">		
+	<div class="Container hidden close" id="_page_lottery">		
 		<div class="Row" style="margin-top:400px">
 			<img class="CenterItem" src="asset/img/text/img-14.png"/>
 		</div>
@@ -208,7 +208,7 @@
 			<img class="Button" src="asset/img/btn/img-15.png" onClick="sendTicketInfo()"/>
 		</div>
 	</div>
-	<div class="Container hidden" id="_page_lottery_success">		
+	<div class="Container hidden close" id="_page_lottery_success">		
 		<div class="Row" style="margin-top:425px">
 			<img class="CenterItem" src="asset/img/text/img-16.png"/>
 		</div>

@@ -3,6 +3,16 @@
   height: 100px;
   position: absolute; /* Enable clipping */
   clip: rect(0px, 100px, 100px, 50px); /* Hide half of the progress bar */
+
+  /*base*/
+  animation-iteration-count: 1;  /* Only run once */
+  animation-fill-mode: forwards; /* Hold the last keyframe */
+  animation-timing-function:linear; /* Linear animation */
+}
+.CountdownWrapper.Anim{
+  animation-duration: 0.01s; /* Complete keyframes asap */
+  animation-delay: 15s; /* Wait half of the animation */
+  animation-name: close-wrapper; 
 }
 /* Set the sizes of the elements that make up the progress bar */
 .CountdownCircle {
@@ -13,29 +23,18 @@
   position: absolute;
   clip: rect(0px, 50px, 100px, 0px);
 }
-/* Using the data attributes for the animation selectors. */
-/* Base settings for all animated elements */
-div[data-anim~=base] {
-  -webkit-animation-iteration-count: 1;  /* Only run once */
-  -webkit-animation-fill-mode: forwards; /* Hold the last keyframe */
-  -webkit-animation-timing-function:linear; /* Linear animation */
+
+
+.CountdownCircle.LeftAnim{
+  animation-duration: 30s; /* Full animation time */
+ animation-name: left-spin;
+}
+.CountdownCircle.RightAnim{
+
+  animation-duration: 15s; /* Half animation time */
+  animation-name: right-spin;
 }
 
-.CountdownWrapper[data-anim~=wrapper] {
-  -webkit-animation-duration: 0.01s; /* Complete keyframes asap */
-  -webkit-animation-delay: 15s; /* Wait half of the animation */
-  -webkit-animation-name: close-wrapper; /* Keyframes name */
-}
-
-.CountdownCircle[data-anim~=left] {
-  -webkit-animation-duration: 30s; /* Full animation time */
-  -webkit-animation-name: left-spin;
-}
-
-.CountdownCircle[data-anim~=right] {
-  -webkit-animation-duration: 15s; /* Half animation time */
-  -webkit-animation-name: right-spin;
-}
 /* Rotate the right side of the progress bar from 0 to 180 degrees */
 @-webkit-keyframes right-spin {
   from {

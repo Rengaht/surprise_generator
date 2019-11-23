@@ -12,6 +12,10 @@ body{
 	font-family: custom-font;
 	border:0;
 	margin:0;
+	background-color: #c9001e;
+}
+div{
+	transition:opacity .5s linear;
 }
 
 .BackGround{
@@ -65,8 +69,14 @@ body{
 }
 
 .hidden{
-	display: none !important;
+	/*display: none !important;*/
+	opacity: 0;
+	transition:opacity .5s linear;
 }
+.close{
+	display:none;
+}
+
 .VideoContainer{
 	position: relative;
 	width:918px;
