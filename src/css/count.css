@@ -1,35 +1,62 @@
-.lds-ring {
-  /*display: inline-block;
-  position: relative;*/
-  width: 100px;
+.CountdownWrapper {
+  width: 100px; /* Set the size of the progress bar */
   height: 100px;
+  position: absolute; /* Enable clipping */
+  clip: rect(0px, 100px, 100px, 50px); /* Hide half of the progress bar */
 }
-.lds-ring div {
-  box-sizing: border-box;
-  display: block;
+/* Set the sizes of the elements that make up the progress bar */
+.CountdownCircle {
+  width: 90px;
+  height: 90px;
+  border: 5px solid white;
+  border-radius: 50px;
   position: absolute;
-  width: 80px;
-  height: 80px;
-  margin: 10px;
-  border: 10px solid #fff;
-  border-radius: 50%;
-  animation: lds-ring 10s cubic-bezier(0.5, 0, 0.5, 1) infinite;
-  border-color: #fff transparent transparent transparent;
+  clip: rect(0px, 50px, 100px, 0px);
 }
-.lds-ring div:nth-child(1) {
-  animation-delay: -0.45s;
+/* Using the data attributes for the animation selectors. */
+/* Base settings for all animated elements */
+div[data-anim~=base] {
+  -webkit-animation-iteration-count: 1;  /* Only run once */
+  -webkit-animation-fill-mode: forwards; /* Hold the last keyframe */
+  -webkit-animation-timing-function:linear; /* Linear animation */
 }
-.lds-ring div:nth-child(2) {
-  animation-delay: -0.3s;
+
+.CountdownWrapper[data-anim~=wrapper] {
+  -webkit-animation-duration: 0.01s; /* Complete keyframes asap */
+  -webkit-animation-delay: 15s; /* Wait half of the animation */
+  -webkit-animation-name: close-wrapper; /* Keyframes name */
 }
-.lds-ring div:nth-child(3) {
-  animation-delay: -0.15s;
+
+.CountdownCircle[data-anim~=left] {
+  -webkit-animation-duration: 30s; /* Full animation time */
+  -webkit-animation-name: left-spin;
 }
-@keyframes lds-ring {
-  0% {
-    transform: rotate(0deg);
+
+.CountdownCircle[data-anim~=right] {
+  -webkit-animation-duration: 15s; /* Half animation time */
+  -webkit-animation-name: right-spin;
+}
+/* Rotate the right side of the progress bar from 0 to 180 degrees */
+@-webkit-keyframes right-spin {
+  from {
+    -webkit-transform: rotate(0deg);
   }
-  100% {
-    transform: rotate(360deg);
+  to {
+    -webkit-transform: rotate(180deg);
+  }
+}
+/* Rotate the left side of the progress bar from 0 to 360 degrees */
+@-webkit-keyframes left-spin {
+  from {
+    -webkit-transform: rotate(0deg);
+  }
+  to {
+    -webkit-transform: rotate(360deg);
+  }
+}
+/* Set the wrapper clip to auto, effectively removing the clip */
+@-webkit-keyframes close-wrapper {
+  to {
+    clip: rect(auto, auto, auto, auto);
   }
 }

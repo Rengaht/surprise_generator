@@ -231,10 +231,10 @@ function startRecord(){
 
 	// start coundown
 	_rec_sec=recordingTimeMS/1000;
-	$('#_record_countdown').text(_rec_sec);
+	$('#_record_countdown_number').text(_rec_sec+'s');
 	let _ready_count=setInterval(function(){
 		_rec_sec--;
-		$('#_record_countdown').text(_rec_sec);
+		$('#_record_countdown_number').text(_rec_sec+'s');
 		
 		if(_rec_sec==0){
 			//stopVideoRecording();

@@ -61,6 +61,14 @@
 	position: absolute;
 	top:40px;
 	right:40px;
+	width:100px;
+	height:100px;
+}
+#_record_countdown_number{
+	z-index: 10;
+    margin-top: 28px;
+    text-align: center;
+    width: 100%;
 }
 
 #_record_qrcode{

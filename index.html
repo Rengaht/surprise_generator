@@ -128,7 +128,7 @@
 			</div>
 		</div>		
 	</div>
-	<div class="Container " id="_page_record_video">		
+	<div class="Container hidden" id="_page_record_video">		
 		<div class="Row" style="margin-top:370px">
 			<div class="CenterItem VideoContainer">
 				<video class="VideoFrame" id="_video_recording" autoplay></video>
@@ -139,9 +139,15 @@
 					<div class="CenterItem" id="_record_ready_countdown" style="margin-top:350px"></div>
 					<img class="CenterItem" src="asset/img/text/img-08.png" style="margin-top:80px"/>			
 				</div>
-				<div class="VideoAcc Container " id="_acc_recording">
-					<img id="_acc_recording" src="asset/img/acc/img-09.png" style="position:absolute;top:40px;left:40px"/>
-					<div id="_record_countdown" class="lds-ring"><div></div></div>
+				<div class="VideoAcc Container hidden" id="_acc_recording">
+					<img id="_acc_recording" src="asset/img/acc/img-09.png" style="position:absolute;top:40px;left:40px"/>			
+					<div id="_record_countdown">
+					<div class="CountdownWrapper" data-anim="base wrapper">
+					  <div class="CountdownCircle" data-anim="base left"></div>
+					  <div class="CountdownCircle" data-anim="base right"></div>
+					 </div>
+					<div id="_record_countdown_number">30s</div>		  
+					</div>
 				</div>
 				<div class="VideoAcc Container hidden" id="_acc_preview"">
 					<img src="asset/img/acc/img-10.png" style="position:absolute;top:40px;left:40px"/>
