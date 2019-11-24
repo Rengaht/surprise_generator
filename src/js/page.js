@@ -140,6 +140,10 @@ window.onload=function(){
 
 	$('#_video_preview').bind('timeupdate',updatePreviewProgress);
 	$('#_progress_video_preview').on("click",changePreviewProgress);
+
+
+	// sound
+	document.getElementById('_sound_bgm').volume=0.2;
 }
 
 function homeClicked(){
@@ -632,11 +636,12 @@ function openKeyboarad(){
 
 // sound //
 function fadeInBgm(){
+
 	document.getElementById('_sound_bgm').play();
-	$('#_sound_bgm').animate({volume:1},1000);
+	$('#_sound_bgm').animate({volume:0.2},1000);
 }
 function fadeOutBgm(){
-	$('#_sound_bgm').animate({volume:0.2},1000);
+	$('#_sound_bgm').animate({volume:0.01},1000);
 }
 function turnOffBgm(){
 	$('#_sound_bgm').animate({volume:0},VIDEO_DELAY);	
@@ -645,15 +650,19 @@ function turnOffBgm(){
 function playSound(type_){
 	switch(type_){
 		case 'count':
+			document.getElementById('_sound_count').volume=0.2;
 			document.getElementById('_sound_count').play();
 			break;
 		case 'click':
+			document.getElementById('_sound_click').volume=0.2;
 			document.getElementById('_sound_click').play();
 			break;
 		case 'finish':
+			document.getElementById('_sound_finish').volume=0.2;
 			document.getElementById('_sound_finish').play();
 			break;
 		case 'error':
+			document.getElementById('_sound_error').volume=0.2;
 			document.getElementById('_sound_error').play();
 			break;		
 	}
