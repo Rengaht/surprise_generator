@@ -1,5 +1,5 @@
-var VIDEO_DELAY=3000;
-var HINT_DELAY=3000;
+const VIDEO_DELAY=3000;
+const HINT_DELAY=3000;
 
 
 var _current_page;
@@ -64,13 +64,7 @@ function loadBackImage(){
 			$('#_back_loading').spritespin("api").loop(false);
 		}
 	});	
-
-
 	
-	
-}
-function backOnLoad(){
-
 }
 
 function leftPad(value, length){ 
@@ -105,8 +99,40 @@ window.onload=function(){
 
 	document.getElementById("_video_watching").onended=onWatchVideoFinish;
 
+	// check input empty
+	$('#_input_watch_code').bind("change paste keyup",function(){
+		$('#_error_watch_code').addClass('hidden');
+		if($(this).val().length<6) $('#_button_watch_code').addClass('Disabled');
+		else $('#_button_watch_code').removeClass('Disabled');		
+	});
+	$('#_input_send_name').bind("change paste keyup",function(){
+		toggleSendSurpriseError(false);
+	});
+	$('#_input_send_phone').bind("change paste keyup",function(){
+		 $(this).val($(this).val().replace(/[^\d]+/g,''));
+		 $(this).val($(this).val().replace(/(\d{4})\-?(\d{3})\-?(\d{3})/,'$1-$2-$3'))
+		toggleSendSurpriseError(false);
+	});
+	$('#_input_lottery_name').bind("change paste keyup",function(){
+		toggleLotteryError(false);
+	});
+	$('#_input_lottery_number').bind("change paste keyup",function(){
+		 $(this).val($(this).val().replace(/([a-zA-Z]{2})\-?(\d{8})/,'$1-$2'))
+		toggleLotteryError(false);
+	});
+	$('#_input_lottery_price').bind("change paste keyup",function(){
+		$(this).val($(this).val().replace(/[^\d]+/g,''));
+		toggleLotteryError(false);	
+	});
+	$('#_input_lottery_email').bind("change paste keyup",function(){		
+		toggleLotteryError(false);	
+	});
+	$('#_input_lottery_phone').bind("change paste keyup",function(){
+		$(this).val($(this).val().replace(/[^\d]+/g,''));
+		$(this).val($(this).val().replace(/(\d{4})\-?(\d{3})\-?(\d{3})/,'$1-$2-$3'))
+		toggleLotteryError(false);	
+	});
 
-	//goPage('_page_record_video');
 
 }
 
@@ -161,6 +187,9 @@ function goPage(page_){
 
 
 	switch(page_){
+		case '_page_home':
+			_video_watched="";
+			break;
 		case '_page_watch_loading':
 			playSound('click');				
 			break;		
@@ -176,13 +205,20 @@ function goPage(page_){
 			playSound('click');
 			break;
 		case '_page_watch_code':
-		case '_page_send':
-		case '_page_lottery':
 				playSound('click');
 				openKeyboarad();
 				$('#_input_watch_code').val('');
+				$('#_error_watch_code').addClass('hidden');
+				break;
+		case '_page_send':
+				playSound('click');
+				openKeyboarad();				
 				$('#_input_send_name').val('');
 				$('#_input_send_phone').val('');
+				break;
+		case '_page_lottery':
+				playSound('click');
+				openKeyboarad();							
 				$('#_input_lottery_name').val('');
 				$('#_input_lottery_number').val('');
 				$('#_input_lottery_price').val('');
@@ -238,7 +274,7 @@ function startRecord(){
 	showItem($('#_acc_recording'));
 		
 	startVideoRecording();
-	startCountDownCircle();
+	restartCountDownCircle();
 	// start coundown
 	_rec_sec=recordingTimeMS/1000;
 	$('#_record_countdown_number').text(_rec_sec+'s');
@@ -246,18 +282,13 @@ function startRecord(){
 
 	
 }
-function startCountDownCircle(){
-	var wrap=$('#_circle_countdown_wrapper');
-	wrap.removeClass('Anim');
-	wrap.addClass('Anim');
-
-	var left=$('#_circle_countdown_left');
-	left.removeClass('LeftAnim');
-	left.addClass('LeftAnim');
-
-	var right=$('#_circle_countdown_right');
-	right.removeClass('RightAnim');
-	right.addClass('RightAnim');
+function restartCountDownCircle(){	
+	restartAnimation($('#_loading_circle'));	
+}
+function restartAnimation(element_){
+	var clone_=element_.clone(true);
+	element_.before(clone_);
+	$(".LoadingCircle").last().remove();
 }
 
 
@@ -278,6 +309,11 @@ function updateRecordCountdown(){
 		_status_record='preview';
 		hideItem($('#_record_finish_button'));
 		hideItem($('#_acc_recording'));
+
+		if(_repeat_record==0){
+			hideItem($('#_button_record_again'));
+		}else showItem($('#_button_record_again'));
+
 		showItem($('#_acc_preview'));
 		playSound('finish');
 
@@ -294,9 +330,36 @@ function showPreviewVideo(){
 
 }
 
+function checkSendSurpriseInput(){
 
+	var invalid_name=$('#_input_send_name').val().length<1;
+
+	var phoneRegx=/^09\d{2}-\d{3}-\d{3}$/;
+	var input_phone=$('#_input_send_phone').val();
+	var invalid_phone=input_phone.length<12 || (!phoneRegx.test(input_phone));
+
+	var error_text="";
+	if(invalid_name) error_text=error_text+"*姓名不可空白\n";
+	if(invalid_phone) error_text=error_text+"*手機號碼錯誤";
+
+	toggleSendSurpriseError(error_text.length>0,error_text);
+	return error_text.length==0;
+
+}
+function toggleSendSurpriseError(show_,error_text){
+	if(show_){
+		$('#_error_send_surprise').text(error_text);
+		$('#_error_send_surprise').removeClass('hidden');
+		$('#_button_send_surprise').addClass('Disabled');
+	}else{
+		$('#_error_send_surprise').addClass('hidden');
+		$('#_button_send_surprise').removeClass('Disabled');
+	}
+}
 
 function sendSurprise(){
+
+	if(!checkSendSurpriseInput()) return;
 	
 	var fd=new FormData();
 	fd.append('action','upload');
@@ -324,14 +387,48 @@ function sendSurprise(){
 			$('#_record_code').text(_guid);
 			_record_qrcode.makeCode(response.share_url);
 
-			
 
 			goPage('_page_send_success');
 		}
 	});
 }
+function checkSendLotteryInput(){
+
+	var error_text="";
+	if($('#_input_lottery_name').val().length<1) error_text=error_text+"*姓名不可空白\n";
+
+	var numRegx=/^[a-zA-Z]{2}-\d{8}$/
+	var input_num=$('#_input_lottery_number').val();
+	if(input_num.length<11 || !numRegx.test(input_num)) error_text=error_text+"*發票號碼錯誤\n";
+
+	if($('#_input_lottery_price').val().length<1) error_text=error_text+"*發票金額不可空白\n";
+
+	var emailRegx=/^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+	var input_email=$('#_input_lottery_email').val().toLowerCase();
+    if(!emailRegx.test(input_email)) error_text=error_text+"*email錯誤\n";
+
+	var phoneRegx=/^09\d{2}-\d{3}-\d{3}$/;
+	var input_phone=$('#_input_lottery_phone').val();
+	if(input_phone.length<12 || (!phoneRegx.test(input_phone))) error_text=error_text+"*手機號碼錯誤";
+
+	toggleLotteryError(error_text.length>0,error_text);
+
+	return error_text.length==0;
+}
+function toggleLotteryError(show_,text_){
+	if(show_){
+		$('#_error_send_lottery').text(text_);
+		$('#_error_send_lottery').removeClass('hidden');
+		$('#_button_send_lottery').addClass('Disabled');
+	}else{
+		$('#_error_send_lottery').addClass('hidden');
+		$('#_button_send_lottery').removeClass('Disabled');
+	}
+}
 
 function sendTicketInfo(){
+
+	if(!checkSendLotteryInput()) return;
 
 	var fd=new FormData();
 	fd.append('action','ticketInfo');
@@ -386,8 +483,13 @@ function loadVideo(){
 		success:function(response){
 			console.log(response);
 			if(response.result==='success'){
+				
+				_video_watched=_video_watched+$('#_input_watch_code').val()+"|";
+
 				setloadingVideo(response.video_url);
 				_watch_qrcode.makeCode(response.share_url);
+			}else{
+				$('#_error_watch_code').removeClass('hidden');
 			}
 		}
 	});

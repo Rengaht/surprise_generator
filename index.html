@@ -4,7 +4,6 @@
 	
 	<link rel="stylesheet" type="text/css" href="src/css/page.css">
 	<link rel="stylesheet" type="text/css" href="src/css/content.css">
-	<link rel="stylesheet" type="text/css" href="src/css/count.css">
 	<script src="src/lib/qrcode.js"> </script>
 	<script src="src/js/record.js"></script>
 	<script src="src/js/page.js"></script>
@@ -63,10 +62,11 @@
 			<img class="CenterItem Text" src="asset/img/text/img-02.png"/>
 		</div>
 		<div class="Row" style="margin-top:80px">
-			<input class="CenterItem" type="text" id="_input_watch_code" placeholder="請輸入六位數序號" maxlength="6"/>
+			<input class="CenterItem" type="text" id="_input_watch_code" placeholder="請輸入六位數序號" maxlength="6" autocomplete="off"/>
 		</div>
 		<div class="Row" style="margin-top:115px">
-			<img class="CenterItem Button" src="asset/img/btn/img-03.png" onClick="loadVideo()"/>	
+			<img class="CenterItem Button Disabled" src="asset/img/btn/img-03.png" onClick="loadVideo()" id="_button_watch_code"/>
+			<div class="ErrorHint hidden" id="_error_watch_code">*此序號不存在</div>	
 		</div>		
 	</div>
 	<div class="Container hidden close" id="_page_watch_loading">		
@@ -134,25 +134,24 @@
 				<video class="VideoFrame" id="_video_recording" autoplay></video>
 				<video class="VideoFrame" id="_video_preview" controls autoplay></video>
 
-				<div class="VideoAcc Container" id="_acc_ready">
+				<div class="VideoAcc Container hidden close" id="_acc_ready">
 					<img class="blink" id="_acc_camera" src="asset/img/acc/img-08.png" style="position:absolute;top:40px;left:40px"/>
 					<div class="CenterItem hidden close" id="_record_ready_countdown" style="margin-top:350px"></div>
 					<img class="CenterItem hidden close" id="_record_ready_text" src="asset/img/text/img-08.png" style="margin-top:80px"/>			
 				</div>
 				<div class="VideoAcc Container hidden close" id="_acc_recording">
 					<img class="blink" id="_acc_recording" src="asset/img/acc/img-09.png" style="position:absolute;top:40px;left:40px"/>			
-					<div id="_record_countdown">
-						<div class="CountdownWrapper Anim" id="_circle_countdown_wrapper" data-anim="base wrapper">
-						  <div class="CountdownCircle LeftAnim" id="_circle_countdown_left" data-anim="base left"></div>
-						  <div class="CountdownCircle RightAnim" id="_circle_countdown_right" data-anim="base right"></div>
-						 </div>
+					<div id="_record_countdown">					
+						 <svg height="100" width="100" class="LoadingCircle" id="_loading_circle">
+						 	<circle cx="50" cy="50" r="40" stroke="white" stroke-width="4" fill="transparent"/>
+						 </svg>
 						<div id="_record_countdown_number">30s</div>		  
 					</div>
 				</div>
 				<div class="VideoAcc Container hidden close" id="_acc_preview"">
 					<img class="blink" src="asset/img/acc/img-10.png" style="position:absolute;top:40px;left:40px"/>
 					<div class="Row hidden close" id="_record_finish_button" style="margin-top:980px;z-index: 20">`
-						<img class="Button" src="asset/img/btn/btn-10.png" onClick="recordAgain()"/>
+						<img class="Button" src="asset/img/btn/btn-10.png" onClick="recordAgain()" id="_button_record_again"/>
 						<img class="Button" src="asset/img/btn/btn-11.png" onClick="goPage('_page_send')"/>
 					</div>
 				</div>
@@ -164,13 +163,14 @@
 			<img class="CenterItem" src="asset/img/text/img-11.png"/>
 		</div>
 		<div class="Row" style="margin-top:80px">	
-			<input class="CenterItem" type="text" id="_input_send_name" placeholder="請輸入他的名字" />
+			<input class="CenterItem" type="text" id="_input_send_name" placeholder="請輸入他的名字" autocomplete="off"/>
 		</div>
 		<div class="Row" style="margin-top:15px">		
-			<input class="CenterItem" type="text" id="_input_send_phone" placeholder="請輸入他的手機號碼 *僅限台灣本島" />
+			<input class="CenterItem" type="tel" id="_input_send_phone" placeholder="請輸入他的手機號碼 *僅限台灣本島" maxlength="12" autocomplete="off"/>
 		</div>
 		<div class="Row" style="margin-top:115px">		
-			<img class="Button" src="asset/img/btn/img-12.png" onClick="sendSurprise()"/>
+			<img class="Button Disabled" src="asset/img/btn/img-12.png" onClick="sendSurprise()" id="_button_send_surprise"/>
+			<div class="ErrorHint hidden" id="_error_send_surprise"></div>
 		</div>
 	</div>
 	<div class="Container hidden close" id="_page_send_success">		
@@ -190,22 +190,23 @@
 			<img class="CenterItem" src="asset/img/text/img-14.png"/>
 		</div>
 		<div class="Row" style="margin-top:50px">
-			<input class="CenterItem" type="text" id="_input_lottery_name" placeholder="你的姓名" />
+			<input class="CenterItem" type="text" id="_input_lottery_name" placeholder="你的姓名" autocomplete="off"/>
 		</div>
 		<div class="Row" style="margin-top:18px">		
-			<input class="CenterItem" type="text" id="_input_lottery_number" placeholder="十位數發票號碼" />
+			<input class="CenterItem" type="text" id="_input_lottery_number" placeholder="十位數發票號碼" maxlength="11" autocomplete="off" />
 		</div>
 		<div class="Row" style="margin-top:18px">
-			<input class="CenterItem" type="text" id="_input_lottery_price" placeholder="發票消費金額" />
+			<input class="CenterItem" type="number" id="_input_lottery_price" placeholder="發票消費金額" autocomplete="off"/>
 		</div>
 		<div class="Row" style="margin-top:18px">
-			<input class="CenterItem" type="text" id="_input_lottery_email" placeholder="E-mail" />
+			<input class="CenterItem" type="text" id="_input_lottery_email" placeholder="E-mail" autocomplete="off" />
 		</div>
 		<div class="Row" style="margin-top:18px">		
-			<input class="CenterItem" type="text" id="_input_lottery_phone" placeholder="手機號碼" />
+			<input class="CenterItem" type="tel" id="_input_lottery_phone" placeholder="手機號碼" maxlength="12" autocomplete="off"/>
 		</div>
 		<div class="Row" style="margin-top:80px">
-			<img class="Button" src="asset/img/btn/img-15.png" onClick="sendTicketInfo()"/>
+			<img class="Button Disabled" src="asset/img/btn/img-15.png" onClick="sendTicketInfo()" id="_button_send_lottery"/>
+			<div class="ErrorHint hidden" id="_error_send_lottery"></div>
 		</div>
 	</div>
 	<div class="Container hidden close" id="_page_lottery_success">		
@@ -213,7 +214,7 @@
 			<img class="CenterItem" src="asset/img/text/img-16.png"/>
 		</div>
 		<div class="Row" style="margin-top:130px">
-			<img class="CenterItem Button" src="asset/img/btn/img-16.png" onClick="goPage('_page_home')"/>
+			<img class="CenterItem Button" src="asset/img/btn/img-16.png" onClick="goPage('_page_home')"/>			
 		</div>
 	</div>
 </body>

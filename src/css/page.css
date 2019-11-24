@@ -63,15 +63,20 @@ div{
 
 .Button{
 	cursor:pointer;
+	opacity: 100%;
+	transition:opacity .2s ease-in-out;
 }
 .Button:nth-of-type(2){
 	margin-left: 80px;
+}
+.Disabled{
+	opacity: 60%;	
 }
 
 .hidden{
 	/*display: none !important;*/
 	opacity: 0;
-	transition:opacity .5s linear;
+	transition:opacity .5s ease-in-out;
 }
 .close{
 	display:none;
@@ -128,4 +133,12 @@ input{
 ::-webkit-scrollbar-thumb {
   background: white;  
   width: 6px;
+}
+
+.ErrorHint{
+	font-size:24px;
+	margin-top: 20px;
+	color:white;
+	text-align:center;
+	white-space: pre-line;
 }

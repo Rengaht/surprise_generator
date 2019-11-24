@@ -27,7 +27,9 @@
 	font-size:24px;
 	font-weight: bold;
 }
-
+#_input_watch_code{
+	text-transform: uppercase;
+}
 #_watch_qrcode_container{
 	position:absolute;
 	bottom:265px;	
@@ -65,8 +67,10 @@
 	height:100px;
 }
 #_record_countdown_number{
-	z-index: 20;
-    margin-top: 28px;
+	position: absolute;
+	top: 28px;
+
+	z-index: 20;    
     text-align: center;
     width: 100%;
 }
@@ -112,10 +116,22 @@
 }*/
 
 .blink{
-	animation: blinker 1s linear infinite;
+	animation: blinker 1.2s ease-in-out infinite;
 }
 @keyframes blinker {
   50% {
     opacity: 0%;
+  }
+}
+
+.LoadingCircle{
+  transform: rotate(-90deg);
+  stroke-dasharray: 352; /* (2PI * 40px) */
+  stroke-dashoffset: 352;
+  animation: offsettozero 30s linear forwards;
+}
+@keyframes offsettozero {
+  to {
+    stroke-dashoffset: 0;
   }
 }
