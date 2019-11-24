@@ -39,11 +39,12 @@ function stop(stream){
 
 function requestCamera(){
 
-  showItem($('#_video_recording'));
+  hideItem($('#_video_recording'));
   hideItem($('#_video_preview'));
 
   hideItem($('#_acc_recording'));
   hideItem($('#_acc_preview'));
+  hideItem($('#_preview_control'));
   hideItem($('#_acc_ready'));
 
   hideItem($('#_record_ready_countdown'));
@@ -64,6 +65,7 @@ function requestCamera(){
 
     
     turnOffBgm();
+    showItem($('#_video_recording'));
     setTimeout(function(){
       showItem($('#_acc_ready'));
     },HINT_DELAY);

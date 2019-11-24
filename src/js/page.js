@@ -98,6 +98,7 @@ window.onload=function(){
 	recording=document.getElementById("_video_recording");
 
 	document.getElementById("_video_watching").onended=onWatchVideoFinish;
+	document.getElementById("_video_preview").onended=onPreviewVideoFinish;
 
 	// check input empty
 	$('#_input_watch_code').bind("change paste keyup",function(){
@@ -133,7 +134,12 @@ window.onload=function(){
 		toggleLotteryError(false);	
 	});
 
+	// video progress
+	$('#_video_watching').bind('timeupdate',updateWatchProgress);
+	$('#_progress_video_watch').on("click",changeWatchProgress);
 
+	$('#_video_preview').bind('timeupdate',updatePreviewProgress);
+	$('#_progress_video_preview').on("click",changePreviewProgress);
 }
 
 function homeClicked(){
@@ -188,6 +194,7 @@ function goPage(page_){
 
 	switch(page_){
 		case '_page_home':
+			playSound('click');	
 			_video_watched="";
 			break;
 		case '_page_watch_loading':
@@ -226,8 +233,18 @@ function goPage(page_){
 				$('#_input_lottery_phone').val('');
 				break;
 		case '_page_send_success':
+				$("#_success_send").hide();
+  				setTimeout(function(){
+    				$("#_success_send").show();
+    				playSound('finish');
+  				}, 800);
+				break;
 		case '_page_lottery_success':
-				playSound('finish');
+				$("#_success_lottery").hide();
+  				setTimeout(function(){
+    				$("#_success_lottery").show();
+    				playSound('finish');
+  				},800);
 				break;
 		case '_page_record_autho':
 		case '_page_home':
@@ -243,6 +260,7 @@ function recordAgain(){
 	_repeat_record--;
 	if(_repeat_record<0) return;
 
+	playSound('click');
 	requestCamera();
 }
 function startCountDown(){
@@ -304,7 +322,7 @@ function updateRecordCountdown(){
 		$('#_video_preview')[0].currentFrame='0';
 
 		hideItem($('#_video_recording'));
-		showItem($('#_video_preview'));
+		hideItem($('#_video_preview'));
 
 		_status_record='preview';
 		hideItem($('#_record_finish_button'));
@@ -314,20 +332,26 @@ function updateRecordCountdown(){
 			hideItem($('#_button_record_again'));
 		}else showItem($('#_button_record_again'));
 
-		showItem($('#_acc_preview'));
-		playSound('finish');
 
-		setTimeout(showPreviewVideo,VIDEO_DELAY);
+		setTimeout(showPreviewVideo,1000);
 		
 	}
 }
 function showPreviewVideo(){
-	$('#_video_preview')[0].play();		
+	showItem($('#_video_preview'));
+	showItem($('#_acc_preview'));
+	showItem($('#_preview_control'));
+
+	playSound('finish');
 
 	setTimeout(function(){
-		showItem($('#_record_finish_button'));
+		$('#_video_preview')[0].play();		
 	},VIDEO_DELAY);
 
+}
+function onPreviewVideoFinish(){
+	playSound('finish');
+	showItem($('#_record_finish_button'));	
 }
 
 function checkSendSurpriseInput(){
@@ -349,18 +373,21 @@ function checkSendSurpriseInput(){
 function toggleSendSurpriseError(show_,error_text){
 	if(show_){
 		$('#_error_send_surprise').text(error_text);
-		$('#_error_send_surprise').removeClass('hidden');
+		showItem($('#_error_send_surprise'));
 		$('#_button_send_surprise').addClass('Disabled');
 	}else{
-		$('#_error_send_surprise').addClass('hidden');
+		hideItem($('#_error_send_surprise'));
 		$('#_button_send_surprise').removeClass('Disabled');
 	}
 }
 
 function sendSurprise(){
 
-	if(!checkSendSurpriseInput()) return;
-	
+	if(!checkSendSurpriseInput()){
+		playSound('error');
+		return;	
+	} 
+	playSound('click');
 	var fd=new FormData();
 	fd.append('action','upload');
 	fd.append('file',recordedBlob);
@@ -428,8 +455,11 @@ function toggleLotteryError(show_,text_){
 
 function sendTicketInfo(){
 
-	if(!checkSendLotteryInput()) return;
-
+	if(!checkSendLotteryInput()){
+		playSound('error');
+		return;
+	} 
+	playSound('click');
 	var fd=new FormData();
 	fd.append('action','ticketInfo');
 	fd.append('guid',_guid);
@@ -460,6 +490,12 @@ function sendTicketInfo(){
 
 function loadVideo(){
 
+	if($('#_input_watch_code').val().length<6){
+		showItem($('#_error_watch_code'));
+		playSound('error');
+		return;
+	}
+
 	var fd=new FormData();
 	fd.append('action','loadVideo');
 	fd.append('guid',$('#_input_watch_code').val());
@@ -489,7 +525,8 @@ function loadVideo(){
 				setloadingVideo(response.video_url);
 				_watch_qrcode.makeCode(response.share_url);
 			}else{
-				$('#_error_watch_code').removeClass('hidden');
+				playSound('error');
+				showItem($('#_error_watch_code'));
 			}
 		}
 	});
@@ -535,11 +572,54 @@ function loadingFrameUpdate(e,data){
 	}
 	
 }
+function pad(num, size) {
+    var s = num+"";
+    while (s.length < size) s = "0" + s;
+    return s;
+}
+function updateWatchProgress(){
+	var cur_time=$('#_video_watching')[0].currentTime;
+	var total_time=recordingTimeMS/1000;//$('#_video_watching')[0].duration;
+	var len=cur_time/total_time*810.0;
+
+	$('#_progress_video_watch').css('width',len);
+	$('#_time_video_watch').text('00:'+pad(Math.round(cur_time),2));
+
+}
+function changeWatchProgress(e){
+	var offset=$(this).offset();
+    var left=(e.pageX-offset.left);
+    var percentage=(left/810.0);
+    var vidTime=recordingTimeMS/1000*percentage;
+	
+	$('#_video_watching')[0].currentTime=vidTime;
+	$('#_video_watching')[0].play();
+}
+
 function onWatchVideoFinish(){
 	showItem($('#_watch_finish_button'));
 	playSound('finish');
 }
 
+
+function updatePreviewProgress(){
+	var cur_time=$('#_video_preview')[0].currentTime;
+	var total_time=recordingTimeMS/1000;//$('#_video_watching')[0].duration;
+	var len=cur_time/total_time*810.0;
+
+	$('#_progress_video_preview').css('width',len);
+	$('#_time_video_preview').text('00:'+pad(Math.round(cur_time),2));
+
+}
+function changePreviewProgress(e){
+	var offset=$(this).offset();
+    var left=(e.pageX-offset.left);
+    var percentage=(left/810.0);
+    var vidTime=recordingTimeMS/1000*percentage;
+	
+	$('#_video_preview')[0].currentTime=vidTime;
+	$('#_video_preview')[0].play();
+}
 
 function openKeyboarad(){
 	// $.ajax({
@@ -573,6 +653,9 @@ function playSound(type_){
 		case 'finish':
 			document.getElementById('_sound_finish').play();
 			break;
+		case 'error':
+			document.getElementById('_sound_error').play();
+			break;		
 	}
 }
 

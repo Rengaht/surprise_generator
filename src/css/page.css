@@ -84,10 +84,11 @@ div{
 
 .VideoContainer{
 	position: relative;
-	width:918px;
+	width:930px;
 	height:1240px;
 	/*background-color: orange;*/
 	overflow: hidden;
+	border:5px solid white;
 }
 .VideoAcc{	
 	width:100%;
@@ -99,9 +100,9 @@ div{
 .VideoFrame{
 	
 	width:1240px;
-	height:948px;
-	transform:translateY(-948px) rotate(90deg);
-    -webkit-transform:translateY(-948px) rotate(90deg);
+	height:930px;
+	transform:translateY(-930px) rotate(90deg);
+    -webkit-transform:translateY(-930px) rotate(90deg);
     transform-origin: bottom left;
 }
 

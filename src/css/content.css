@@ -135,3 +135,55 @@
     stroke-dashoffset: 0;
   }
 }
+
+.VideoControl{
+	width: 940px;
+	height:60px;
+	background-color:white;
+}
+.progress{
+	position: relative;
+	top:22.5px;
+	left:20px;
+	width:810px;
+	height:10px;
+	background-color:#CF626A;
+	cursor:pointer;
+}
+.progress-bar{
+	width:0px;
+	height:10px;
+	background-color:#BB1A28;	
+}
+.VideoTime{
+	float:right;
+	margin-right:20px;
+	font-size:28px;
+	color:#BB1A28;
+}
+
+
+
+.CheckCircle{
+  width: 135px;
+  height: 135px;
+  border-radius: 50%;
+  display: block;
+  stroke-width: 2;
+  stroke: #BB1A28;
+  stroke-miterlimit: 10;
+  margin:auto;
+}
+
+.CheckMark{
+  transform-origin: 50% 50%;
+  stroke-dasharray: 120;
+  stroke-dashoffset: 120;
+  animation: stroke 0.3s cubic-bezier(0.65, 0, 0.45, 1) forwards;
+}
+
+@keyframes stroke {
+  100% {
+    stroke-dashoffset: 0;
+  }
+}

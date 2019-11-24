@@ -26,6 +26,9 @@
 	<audio id="_sound_finish">
     	<source src="asset/sound/result.mp3" type="audio/mp3">
 	</audio>
+	<audio id="_sound_error">
+    	<source src="asset/sound/pop.wav" type="audio/mp3">
+	</audio>
  
 	<div id="_back_image_big" class="BackGround" >
 		<div id="_back_loop_big"></div>
@@ -83,15 +86,23 @@
 	<div class="Container hidden close" id="_page_watch_video">		
 		<div class="Row" style="margin-top:370px">
 			<div class="CenterItem VideoContainer" >
-				<video class="VideoFrame" id="_video_watching" preload="auto" autoplay controls></video>
+				<video class="VideoFrame" id="_video_watching" preload="auto" autoplay></video>
 				<div class="VideoAcc Container hidden close" id="_watch_finish_button">
 					<div class="CenterItem" id="_watch_qrcode_container">
 						<div id="_watch_qrcode"></div>
 					</div>
 					<img class="CenterItem Button" src="asset/img/btn/img-06.png" onClick="goPage('_page_record_autho')" id="_button_make_record"/>					
-				</div>
+				</div>				
 			</div>
-		</div>		
+		</div>	
+		<div class="Row" style="margin-top:0px">		
+			<div class="CenterItem VideoControl">
+				<div class="progress">
+					<div class="progress-bar" role="progressbar" id="_progress_video_watch"></div>
+				</div>					
+				<div class="VideoTime" id="_time_video_watch">00:00</div>
+			</div>
+		</div>	
 	</div>
 	<div class="Container hidden close" id="_page_record_autho">	
 		<div class="Row" style="margin-top:400px">
@@ -132,7 +143,7 @@
 		<div class="Row" style="margin-top:370px">
 			<div class="CenterItem VideoContainer">
 				<video class="VideoFrame" id="_video_recording" autoplay></video>
-				<video class="VideoFrame" id="_video_preview" controls autoplay></video>
+				<video class="VideoFrame" id="_video_preview" autoplay></video>
 
 				<div class="VideoAcc Container hidden close" id="_acc_ready">
 					<img class="blink" id="_acc_camera" src="asset/img/acc/img-08.png" style="position:absolute;top:40px;left:40px"/>
@@ -157,6 +168,14 @@
 				</div>
 			</div>			
 		</div>		
+		<div class="Row hidden" id="_preview_control" style="margin-top:0px">		
+			<div class="CenterItem VideoControl">
+				<div class="progress">
+					<div class="progress-bar" role="progressbar" id="_progress_video_preview"></div>
+				</div>					
+				<div class="VideoTime" id="_time_video_preview">00:00</div>
+			</div>
+		</div>	
 	</div>
 	<div class="Container hidden close" id="_page_send">		
 		<div class="Row" style="margin-top:440px">
@@ -175,7 +194,13 @@
 	</div>
 	<div class="Container hidden close" id="_page_send_success">		
 		<div class="Row" style="margin-top:340px">
-			<img class="CenterItem" src="asset/img/text/img-13.png"/>
+			
+			<svg class="CenterItem CheckCircle" viewBox="0 0 135 135">
+			    <circle cx="67.5" cy="67.5" r="67.5" fill="white" stroke="white"/>
+			    <path class="CheckMark" fill="none" d="M40 75 L 60 93 L 95 46" stroke-width="8" stroke-linecap="round" id="_success_send"/>
+			</svg>
+
+			<img class="CenterItem" src="asset/img/text/img-13.png" style="margin-top:55px"/>
 		</div>
 		<div id="_record_code"></div>
 		<div id="_record_qrcode"></div>
@@ -211,7 +236,11 @@
 	</div>
 	<div class="Container hidden close" id="_page_lottery_success">		
 		<div class="Row" style="margin-top:425px">
-			<img class="CenterItem" src="asset/img/text/img-16.png"/>
+			<svg class="CenterItem CheckCircle" viewBox="0 0 135 135" id="_success_send">
+			    <circle cx="67.5" cy="67.5" r="67.5" fill="white" stroke="white"/>
+			    <path class="CheckMark" fill="none" d="M40 75 L 60 93 L 95 46" stroke-width="8" stroke-linecap="round" id="_success_lottery"/>
+			</svg>
+			<img class="CenterItem" src="asset/img/text/img-16.png" style="margin-top:55px"/>			
 		</div>
 		<div class="Row" style="margin-top:130px">
 			<img class="CenterItem Button" src="asset/img/btn/img-16.png" onClick="goPage('_page_home')"/>			
