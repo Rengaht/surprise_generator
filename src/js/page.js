@@ -1,6 +1,11 @@
 const VIDEO_DELAY=3000;
-const HINT_DELAY=3000;
+const HINT_DELAY=1500;
+const VIDEO_FRAME_DELAY=1000;
+const VOLUME_HIGH=0.5;
+const VOLUME_LOW=0.1;
 
+const GAP_WATCH_RECORD=10000;
+const GAP_SLEEP=120000;
 
 var _current_page;
 var _next_page;
@@ -9,11 +14,16 @@ var _repeat_record;
 
 var _rec_sec,_record_countdown_interval;
 var _ready_sec,_ready_countdown_interval;
+var _show_preview_timeout;
 
 
 // user //
 var _guid="";
+
+var _video_guid;
 var _video_watched="";
+var _video_watched_time=new Date();
+
 var _record_share_url;
 
 // qrcode //
@@ -23,6 +33,12 @@ var _record_qrcode;
 
 // loading //
 var _watch_loading_buffer;
+// sleep //
+var _timer_sleep;
+
+// websocket //
+var _websocket;
+
 
 function loadBackImage(){
 	var src_=[];
@@ -144,17 +160,20 @@ window.onload=function(){
 
 	// sound
 	document.getElementById('_sound_bgm').volume=0.2;
+
+	connectToWebsocket();
 }
 
 function homeClicked(){
 
-	//check video recording
-	stopVideoRecording();
-	// TODO: check video playing
-	$('#_video_preview')[0].pause();
-	$('#_video_watching')[0].pause();
-
 	goPage('_page_home');
+}
+function clearAllTimerout(){
+	var id=window.setTimeout(function() {}, 0);
+	while(id--){
+    	window.clearTimeout(id); 
+    	// will do nothing if no timeout with id is present
+	}
 }
 
 function setHideHomeButton(set_){
@@ -198,34 +217,51 @@ function goPage(page_){
 
 	switch(page_){
 		case '_page_home':
-			playSound('click');	
-			_video_watched="";
+			playSound('click');
+			
+			//stop video recording & playing
+			resetRecorder();
+			sendLight('sleep');
+
+			$('#_video_watching')[0].pause();
+
+			clearSleepTimer();			
 			break;
 		case '_page_watch_loading':
-			playSound('click');				
+			playSound('click');		
+
+			clearSleepTimer();		
 			break;		
 		case '_page_record_video':
 			playSound('click');
 			_repeat_record=2;
 			_status_record='ready';
 
+			resetRecorder();
 			requestCamera();
-			
+			clearSleepTimer();			
 			break;		
 		case '_page_watch_video':
 			playSound('click');
+			clearSleepTimer()
 			break;
 		case '_page_watch_code':
-				playSound('click');
-				openKeyboarad();
-				$('#_input_watch_code').val('');
-				$('#_error_watch_code').addClass('hidden');
-				break;
+			playSound('click');
+			openKeyboarad();
+			$('#_input_watch_code').val('');
+			$('#_error_watch_code').addClass('hidden');
+			
+
+			sendLight('recording');
+			resetSleepTimer();
+			break;		
 		case '_page_send':
 				playSound('click');
 				openKeyboarad();				
 				$('#_input_send_name').val('');
 				$('#_input_send_phone').val('');
+
+				resetSleepTimer();
 				break;
 		case '_page_lottery':
 				playSound('click');
@@ -235,6 +271,8 @@ function goPage(page_){
 				$('#_input_lottery_price').val('');
 				$('#_input_lottery_email').val('');
 				$('#_input_lottery_phone').val('');
+				
+				resetSleepTimer();
 				break;
 		case '_page_send_success':
 				$("#_success_send").hide();
@@ -242,6 +280,8 @@ function goPage(page_){
     				$("#_success_send").show();
     				playSound('finish');
   				}, 800);
+
+				resetSleepTimer();
 				break;
 		case '_page_lottery_success':
 				$("#_success_lottery").hide();
@@ -249,11 +289,17 @@ function goPage(page_){
     				$("#_success_lottery").show();
     				playSound('finish');
   				},800);
+				
+				
+				resetSleepTimer();
 				break;
 		case '_page_record_autho':
-		case '_page_home':
 				playSound('click');
-				break;
+				checkWatchedVideo();
+				
+				sendLight('recording');
+				resetSleepTimer();
+				break;		
 	}
 
 	showItem($('#'+page_));
@@ -266,6 +312,7 @@ function recordAgain(){
 
 	playSound('click');
 	requestCamera();
+	clearSleepTimer();	
 }
 function startCountDown(){
 	
@@ -337,11 +384,14 @@ function updateRecordCountdown(){
 		}else showItem($('#_button_record_again'));
 
 
-		setTimeout(showPreviewVideo,1000);
+		_show_preview_timeout=setTimeout(showPreviewVideo,1000);
 		
 	}
 }
 function showPreviewVideo(){
+
+	if(_current_page!=='_page_record_video') return;
+
 	showItem($('#_video_preview'));
 	showItem($('#_acc_preview'));
 	showItem($('#_preview_control'));
@@ -349,13 +399,15 @@ function showPreviewVideo(){
 	playSound('finish');
 
 	setTimeout(function(){
-		$('#_video_preview')[0].play();		
+		if(_current_page==='_page_record_video')
+			$('#_video_preview')[0].play();		
 	},VIDEO_DELAY);
 
 }
 function onPreviewVideoFinish(){
 	playSound('finish');
 	showItem($('#_record_finish_button'));	
+	resetSleepTimer();
 }
 
 function checkSendSurpriseInput(){
@@ -397,6 +449,7 @@ function sendSurprise(){
 	fd.append('file',recordedBlob);
 	fd.append('send_name',$('#_input_send_name').val());
 	fd.append('send_number',$('#_input_send_phone').val());
+	fd.append('store_id',MACHINE_ID);
 
 	sendSMS($('#_input_send_name').val(),$('#_input_send_phone').val());
 	_record_qrcode.clear();
@@ -502,7 +555,10 @@ function loadVideo(){
 
 	var fd=new FormData();
 	fd.append('action','loadVideo');
+	fd.append('store_id',MACHINE_ID);
 	fd.append('guid',$('#_input_watch_code').val());
+
+	_video_guid=$('#_input_watch_code').val();
 
 	hideItem($('#_watch_finish_button'));
 	hideItem($('#_loading_text'));
@@ -524,7 +580,7 @@ function loadVideo(){
 			console.log(response);
 			if(response.result==='success'){
 				
-				_video_watched=_video_watched+$('#_input_watch_code').val()+"|";
+				//setWatchedVideo($('#_input_watch_code').val());
 
 				setloadingVideo(response.video_url);
 				_watch_qrcode.makeCode(response.share_url);
@@ -603,6 +659,10 @@ function changeWatchProgress(e){
 function onWatchVideoFinish(){
 	showItem($('#_watch_finish_button'));
 	playSound('finish');
+
+	setWatchedVideo(_video_guid);
+
+	resetSleepTimer();
 }
 
 
@@ -638,10 +698,10 @@ function openKeyboarad(){
 function fadeInBgm(){
 
 	document.getElementById('_sound_bgm').play();
-	$('#_sound_bgm').animate({volume:0.2},1000);
+	$('#_sound_bgm').animate({volume:VOLUME_HIGH},1000);
 }
 function fadeOutBgm(){
-	$('#_sound_bgm').animate({volume:0.01},1000);
+	$('#_sound_bgm').animate({volume:VOLUME_LOW},1000);
 }
 function turnOffBgm(){
 	$('#_sound_bgm').animate({volume:0},VIDEO_DELAY);	
@@ -650,38 +710,91 @@ function turnOffBgm(){
 function playSound(type_){
 	switch(type_){
 		case 'count':
-			document.getElementById('_sound_count').volume=0.2;
+			document.getElementById('_sound_count').volume=VOLUME_HIGH;
 			document.getElementById('_sound_count').play();
 			break;
 		case 'click':
-			document.getElementById('_sound_click').volume=0.2;
+			document.getElementById('_sound_click').volume=VOLUME_HIGH;
 			document.getElementById('_sound_click').play();
 			break;
 		case 'finish':
-			document.getElementById('_sound_finish').volume=0.2;
+			document.getElementById('_sound_finish').volume=VOLUME_HIGH;
 			document.getElementById('_sound_finish').play();
 			break;
 		case 'error':
-			document.getElementById('_sound_error').volume=0.2;
+			document.getElementById('_sound_error').volume=VOLUME_HIGH;
 			document.getElementById('_sound_error').play();
 			break;		
 	}
 }
 
 function hideItem(item_){
-	//if(item_.hasClass('hidden')) return;
+	
+	if(item_.hasClass('hidden')) return;	
+	
 	item_.addClass('hidden');
 	setTimeout(function(){
 		item_.addClass('close');
-	},500);
+	},200);
 }
 function showItem(item_){
-	//if(!item_.hasClass('hidden')) return;
+	
+	if(!item_.hasClass('hidden')) return;
+	
 	item_.removeClass('close');
 	setTimeout(function(){		
 		item_.removeClass('hidden');		
 	},100);
 }
+
+function checkWatchedVideo(){
+	if(getTimeFromNow(_video_watched_time)>GAP_WATCH_RECORD){
+		_video_watched="";
+		_video_watched_time=new Date();
+	}
+}
+function setWatchedVideo(id_){
+
+	_video_watched=id_;
+	_video_watched_time=new Date();
+}
+
+function getTimeFromNow(date_){
+
+	var oToday=new Date();
+	var nDiff=oToday.getTime()-date_.getTime();
+	return Math.floor(nDiff/1000);
+}
+
+function clearSleepTimer(){
+	if(_timer_sleep!==null) clearTimeout(_timer_sleep);
+}
+function resetSleepTimer(){
+	
+	clearSleepTimer();
+	//console.log('----------- detect sleep -----------');
+	_timer_sleep=setTimeout(function(){
+		console.log('----------- go sleep -----------');
+		goPage('_page_home');
+	},GAP_SLEEP);
+}
+
+function connectToWebsocket(){
+	_websocket=new WebSocket('ws://localhost:3000/');
+	_websocket.onopen=()=>{
+        console.log('ws: open connection');
+    };
+    _websocket.onclose=()=>{
+        console.log('ws: close connection');
+    };         
+    _websocket.onerror=event=>{
+        console.log('ws: websocket error: ',event);
+    };   
+}
+function sendLight(type_){
+	_websocket.send(type_);
+}
+
 
 // TODO:
 function sendSMS(name_,phone_){

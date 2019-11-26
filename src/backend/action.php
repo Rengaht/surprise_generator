@@ -76,7 +76,7 @@
 
 
 					// write to db!!!
-					$cmd='INSERT INTO user_data (id,send_name,send_number) VALUES ("'.$guid.'" , "'.$_POST['send_name'].'","'.$_POST['send_number'].'")';
+					$cmd='INSERT INTO user_data (id,send_name,send_number,store) VALUES ("'.$guid.'" , "'.$_POST['send_name'].'","'.$_POST['send_number'].'","'.$_POST['store_id'].'")';
 					if($conn->query($cmd)===TRUE){
 						$json['result']='success';
 
@@ -103,11 +103,23 @@
 				$result=$conn->query($cmd);
 		
 				if($result->num_rows>0){
-				
+
+					if($row = $result->fetch_assoc()){
+						$json['celebrity']=$row['celebrity'];
+					}
+					
 					if(file_exists('./video/'.$_POST['guid'].$video_type)){
 						$json['result']='success';
 						$json['video_url']=$video_url.$_POST['guid'].$video_type;
 						$json['share_url']=$share_url.$_POST['guid'];
+
+						$log='INSERT INTO video_record (video_id,store) VALUES ("'.$_POST['guid'].'","'.$_POST['store_id'].'")';
+						if($conn->query($log)===TRUE){
+							$json['log']='success';
+						}else{
+							$json['log']='something wrong';
+						}
+
 					}else{
 						$json['result']='file not exists! '.$video_folder.$_POST['guid'].$video_type;	
 					} 

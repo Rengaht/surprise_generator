@@ -9,6 +9,9 @@ function wait(delayInMS) {
   return new Promise(resolve => setTimeout(resolve, delayInMS));
 }
 function startStreamRecording(stream, lengthInMS){
+
+  console.log('Start Recroding...');
+
   recorder = new MediaRecorder(stream);
   let data = [];
 
@@ -56,6 +59,8 @@ function requestCamera(){
     audio: true
   };
  
+  console.log('Request Camera...');
+
   navigator.mediaDevices.getUserMedia(hdConstraints)
   .then(stream => {
     recording.srcObject = stream;
@@ -63,15 +68,21 @@ function requestCamera(){
     recording.captureStream = recording.captureStream || recording.mozCaptureStream;
     
 
+    turnOffBgm();   
+    setTimeout(function(){
+       showItem($('#_video_recording'));
+        setTimeout(function(){     
+          showItem($('#_acc_ready'));
+          
+          setTimeout(function(){
+            startCountDown();
+          },VIDEO_DELAY);      
+
+        },HINT_DELAY);
+       
+    },VIDEO_FRAME_DELAY);
     
-    turnOffBgm();
-    showItem($('#_video_recording'));
-    setTimeout(function(){
-      showItem($('#_acc_ready'));
-    },HINT_DELAY);
-    setTimeout(function(){
-      startCountDown();
-    },HINT_DELAY+VIDEO_DELAY);
+    
 
     return new Promise(resolve => recording.onplaying = resolve);
 
@@ -105,5 +116,17 @@ function startVideoRecording(){
 function stopVideoRecording(){
   //recorder.stop();
   stop(recording.srcObject);
+  
+  resetSleepTimer();
+}
+function resetRecorder(){
+  if(recorder!==undefined && recorder.state==recording) recorder.stop();
 
+  clearTimeout(_show_preview_timeout);
+  clearInterval(_record_countdown_interval);
+  clearInterval(_ready_countdown_interval);
+
+  
+  $('#_video_preview')[0].pause();
+  $('#_video_preview')[0].src="";
 }

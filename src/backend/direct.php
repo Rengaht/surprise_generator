@@ -10,6 +10,16 @@
 
 <html>
 	<head>		
+		<!-- Global site tag (gtag.js) - Google Analytics -->
+		<script async src="https://www.googletagmanager.com/gtag/js?id=UA-80306203-9"></script>
+		<script>
+		  window.dataLayer = window.dataLayer || [];
+		  function gtag(){dataLayer.push(arguments);}
+		  gtag('js', new Date());
+
+		  gtag('config', 'UA-80306203-9');
+		</script>
+
 		<title>// 驚喜產生器 SURPRISE GENERATOR //</title>
 		<link href="https://fonts.googleapis.com/css?family=Noto+Serif+TC:700&display=swap" rel="stylesheet">
 		<style type="text/css">
