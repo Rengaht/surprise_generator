@@ -89,6 +89,8 @@ function leftPad(value, length){
 
 window.onload=function(){
 
+	
+
 	loadBackImage();
 	_current_page='_page_home';
 	setHideHomeButton(true);
@@ -123,6 +125,7 @@ window.onload=function(){
 		else $('#_button_watch_code').removeClass('Disabled');		
 	});
 	$('#_input_send_name').bind("change paste keyup",function(){
+		$(this).val($(this).val().replace('|',''));
 		toggleSendSurpriseError(false);
 	});
 	$('#_input_send_phone').bind("change paste keyup",function(){
@@ -144,7 +147,7 @@ window.onload=function(){
 	$('#_input_lottery_email').bind("change paste keyup",function(){		
 		toggleLotteryError(false);	
 	});
-	$('#_input_lottery_phone').bind("change paste keyup",function(){
+	$('#_input_lottery_phone').bind("change paste keyup",function(){		
 		$(this).val($(this).val().replace(/[^\d]+/g,''));
 		$(this).val($(this).val().replace(/(\d{4})\-?(\d{3})\-?(\d{3})/,'$1-$2-$3'))
 		toggleLotteryError(false);	
@@ -451,7 +454,7 @@ function sendSurprise(){
 	fd.append('send_number',$('#_input_send_phone').val());
 	fd.append('store_id',MACHINE_ID);
 
-	sendSMS($('#_input_send_name').val(),$('#_input_send_phone').val());
+	
 	_record_qrcode.clear();
 
 	$.ajax({
@@ -471,6 +474,7 @@ function sendSurprise(){
 			$('#_record_code').text(_guid);
 			_record_qrcode.makeCode(response.share_url);
 
+			sendSMS($('#_input_send_phone').val(),$('#_input_send_name').val(),_guid);
 
 			goPage('_page_send_success');
 		}
@@ -797,7 +801,9 @@ function sendLight(type_){
 
 
 // TODO:
-function sendSMS(name_,phone_){
+function sendSMS(phone_,name_,guid_){
 
+	phone_=phone_.split('-').join('');
+	_websocket.send('sms|'+phone_+'|'+name_+'|'+guid_);
 
 }
