@@ -4,16 +4,19 @@ const path=require('path');
 
 const PORT=3000;
 const EXPLODE_COUNT=20;
-const SERIAL_COM='COM144';
+const PARAM=require('../../_param.json');
+console.log(PARAM);
 
 // websocket server //
 const server=express().listen(PORT,()=>console.log('websocket listen on '+PORT));
 const wws=new SocketServer({server});
 
+const JandiURL='https://wh.jandi.com/connect-api/webhook/14606752/6f707d68c6bc89e0ae59cc0ce5e7d0ac';
+
 
 const exec = require('child_process').exec;
 var iconv = require('iconv-lite');
-
+var request = require('request');
 
 
 wws.on('connection',ws=>{
@@ -34,7 +37,7 @@ wws.on('connection',ws=>{
 
 // serial port //
 const Serialport=require('serialport');
-const port=new Serialport(SERIAL_COM,{baudRate:9600,autoOpen:false});
+const port=new Serialport(PARAM.SERIAL_PORT,{baudRate:9600,autoOpen:false});
 
 console.log('open serial port!');
 port.open(function(err){
@@ -43,6 +46,7 @@ port.open(function(err){
 });
 port.on('open',function(){
 	console.log('serial port open!');
+	sendLog('serial port open');
 	sendLight('sleep');
 });
 port.on('error', function(err) {
@@ -55,11 +59,14 @@ port.on('error', function(err) {
 // html server //
 const app=express();
 app.use(express.static('../../'));
-app.get('/',function(req,res){	
-	res.sendFile('C://xampp/htdocs/surprise_generator/index.html');
+app.get('/',function(req,res){		
+	res.sendFile('C://xampp/htdocs/surprise_generator/index.html');	
 });
 
-var HttpServer=app.listen(5000);
+var HttpServer=app.listen(5000,function(){
+	console.log('http server listening at 5000');
+	sendLog('http server listening at 5000');
+});
 
 function sendLight(light_){
 	switch(light_){
@@ -77,6 +84,15 @@ function onSerialError(err){
   	}
   	console.log('message written');
 }
+
+process.on('unhandledRejection', (reason, p) => {
+    console.error(reason, 'Unhandled Rejection at Promise', p);
+    sendLog('[!!!]'+reason);
+}).on('uncaughtException', err => {
+    console.error(err, 'Uncaught Exception thrown');
+    sendLog('[!!!]'+err);
+    process.exit(1);
+});
 
 process.on('exit', function(){
 	port.close();
@@ -108,4 +124,14 @@ function sendMessage(phone_,message_){
 	});
 
 
+}
+
+function sendLog(message_){
+	request({
+		url:JandiURL,
+		method:'POST',
+		json:{body:'['+PARAM.MACHINE_ID+'][node] '+message_}
+	},function(err,rep,body){
+		if(err) console.log(err);
+	});
 }

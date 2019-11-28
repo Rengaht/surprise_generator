@@ -2,7 +2,7 @@ var preview;
 var recording;
 var recorder;
 
-let recordingTimeMS = 5000;
+let recordingTimeMS = 30000;
 var recordedBlob;
 
 function wait(delayInMS) {
@@ -103,7 +103,7 @@ function startVideoRecording(){
     
     //downloadButton.href = recording.src;
     //downloadButton.download = "RecordedVideo.webm";
-    
+    sendJandiLog("start recording");
     console.log("Successfully recorded " + recordedBlob.size + " bytes of " +
         recordedBlob.type + " media.");
     stopVideoRecording();
@@ -118,6 +118,7 @@ function stopVideoRecording(){
   stop(recording.srcObject);
   
   resetSleepTimer();
+  //sendJandiLog("stop recording");
 }
 function resetRecorder(){
   if(recorder!==undefined && recorder.state==recording) recorder.stop();

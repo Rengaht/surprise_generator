@@ -126,8 +126,8 @@
 
 .LoadingCircle{
   transform: rotate(-90deg);
-  stroke-dasharray: 352; /* (2PI * 40px) */
-  stroke-dashoffset: 352;
+  stroke-dasharray: 251; /* (2PI * 40px) */
+  stroke-dashoffset: 251;
   animation: offsettozero 30s linear forwards;
 }
 @keyframes offsettozero {

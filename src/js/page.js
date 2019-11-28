@@ -1,11 +1,17 @@
+
+const SEND_SMS=false;
+
 const VIDEO_DELAY=3000;
 const HINT_DELAY=1500;
 const VIDEO_FRAME_DELAY=1000;
 const VOLUME_HIGH=0.5;
 const VOLUME_LOW=0.1;
 
-const GAP_WATCH_RECORD=10000;
-const GAP_SLEEP=120000;
+const GAP_WATCH_RECORD=60000;
+const GAP_SLEEP=200000;
+
+var PARAM;
+
 
 var _current_page;
 var _next_page;
@@ -17,12 +23,14 @@ var _ready_sec,_ready_countdown_interval;
 var _show_preview_timeout;
 
 
+
 // user //
 var _guid="";
 
 var _video_guid;
 var _video_watched="";
 var _video_watched_time=new Date();
+var _video_watched_is_celebrity=false;
 
 var _record_share_url;
 
@@ -49,8 +57,10 @@ function loadBackImage(){
 		animate: true,
 		retainAnimate:true,
 		sizeMode:'fill',
-		responsive:false,
-		frames:60
+		//responsive:false,
+		frames:60,
+		width:1080,
+		height:1920
 	});			
 
 	var src2_=[];
@@ -61,8 +71,10 @@ function loadBackImage(){
 		animate: true,
 		retainAnimate:true,
 		sizeMode:'fill',
-		responsive:false,
-		frames:60
+		//responsive:false,
+		frames:60,
+		width:1080,
+		height:1920
 	});			
 
 	var _img_loading=[];
@@ -73,8 +85,10 @@ function loadBackImage(){
 		animate: true,
 		retainAnimate:false,
 		sizeMode:'fill',
-		responsive:false,
+		//responsive:false,
 		frameTime:33,
+		width:1080,
+		height:1920,
 		onFrame:loadingFrameUpdate,
 		onLoad:function(){
 			$('#_back_loading').spritespin("api").loop(false);
@@ -89,7 +103,12 @@ function leftPad(value, length){
 
 window.onload=function(){
 
-	
+	document.addEventListener('contextmenu', event => event.preventDefault());
+	$.getJSON("_param.json", function(json){
+		PARAM=json;
+		console.log(json);
+		sendJandiLog('set up');
+	});
 
 	loadBackImage();
 	_current_page='_page_home';
@@ -120,51 +139,77 @@ window.onload=function(){
 
 	// check input empty
 	$('#_input_watch_code').bind("change paste keyup",function(){
+		resetSleepTimer();
+
 		$('#_error_watch_code').addClass('hidden');
 		if($(this).val().length<6) $('#_button_watch_code').addClass('Disabled');
 		else $('#_button_watch_code').removeClass('Disabled');		
 	});
 	$('#_input_send_name').bind("change paste keyup",function(){
+		resetSleepTimer();
+
 		$(this).val($(this).val().replace('|',''));
 		toggleSendSurpriseError(false);
 	});
 	$('#_input_send_phone').bind("change paste keyup",function(){
+		resetSleepTimer();
+
 		 $(this).val($(this).val().replace(/[^\d]+/g,''));
 		 $(this).val($(this).val().replace(/(\d{4})\-?(\d{3})\-?(\d{3})/,'$1-$2-$3'))
 		toggleSendSurpriseError(false);
 	});
 	$('#_input_lottery_name').bind("change paste keyup",function(){
+		resetSleepTimer();
+
 		toggleLotteryError(false);
 	});
 	$('#_input_lottery_number').bind("change paste keyup",function(){
+		resetSleepTimer();
 		 $(this).val($(this).val().replace(/([a-zA-Z]{2})\-?(\d{8})/,'$1-$2'))
 		toggleLotteryError(false);
 	});
 	$('#_input_lottery_price').bind("change paste keyup",function(){
+		resetSleepTimer();
 		$(this).val($(this).val().replace(/[^\d]+/g,''));
 		toggleLotteryError(false);	
 	});
 	$('#_input_lottery_email').bind("change paste keyup",function(){		
+		resetSleepTimer();
 		toggleLotteryError(false);	
 	});
 	$('#_input_lottery_phone').bind("change paste keyup",function(){		
+		resetSleepTimer();
 		$(this).val($(this).val().replace(/[^\d]+/g,''));
 		$(this).val($(this).val().replace(/(\d{4})\-?(\d{3})\-?(\d{3})/,'$1-$2-$3'))
 		toggleLotteryError(false);	
 	});
+	$('#_input_celebrity_name').bind("change paste keyup",function(){
+		resetSleepTimer();
+		toggleCelebrityError(false);
+	});
+	$('#_input_celebrity_email').bind("change paste keyup",function(){		
+		resetSleepTimer();
+		toggleCelebrityError(false);	
+	});
+	$('#_input_celebrity_phone').bind("change paste keyup",function(){		
+		resetSleepTimer();
+
+		$(this).val($(this).val().replace(/[^\d]+/g,''));
+		$(this).val($(this).val().replace(/(\d{4})\-?(\d{3})\-?(\d{3})/,'$1-$2-$3'))
+		toggleCelebrityError(false);	
+	});
 
 	// video progress
 	$('#_video_watching').bind('timeupdate',updateWatchProgress);
-	$('#_progress_video_watch').on("click",changeWatchProgress);
-
 	$('#_video_preview').bind('timeupdate',updatePreviewProgress);
-	$('#_progress_video_preview').on("click",changePreviewProgress);
 
 
 	// sound
 	document.getElementById('_sound_bgm').volume=0.2;
 
 	connectToWebsocket();
+
+	
 }
 
 function homeClicked(){
@@ -246,7 +291,11 @@ function goPage(page_){
 			break;		
 		case '_page_watch_video':
 			playSound('click');
-			clearSleepTimer()
+			clearSleepTimer();
+			setTimeout(function(){		
+				$('#_video_watching')[0].play();
+				$('#_video_watching')[0].muted=false;
+			},VIDEO_DELAY);
 			break;
 		case '_page_watch_code':
 			playSound('click');
@@ -277,7 +326,24 @@ function goPage(page_){
 				
 				resetSleepTimer();
 				break;
+		case '_page_celebrity':
+				playSound('click');
+				openKeyboarad();							
+				$('#_input_celebrity_name').val('');
+				$('#_input_celebrity_email').val('');
+				$('#_input_celebrity_phone').val('');
+				
+				resetSleepTimer();
+				break;
 		case '_page_send_success':
+				if(_video_watched_is_celebrity){
+					hideItem($('#_btn_normal'));
+					showItem($('#_btn_celebrity'));
+				}else{
+					hideItem($('#_btn_celebrity'));
+					showItem($('#_btn_normal'));
+				}
+
 				$("#_success_send").hide();
   				setTimeout(function(){
     				$("#_success_send").show();
@@ -406,10 +472,13 @@ function showPreviewVideo(){
 			$('#_video_preview')[0].play();		
 	},VIDEO_DELAY);
 
+	setTimeout(function(){
+		showItem($('#_record_finish_button'));
+	},VIDEO_DELAY*2);
+
 }
 function onPreviewVideoFinish(){
-	playSound('finish');
-	showItem($('#_record_finish_button'));	
+	playSound('finish');	
 	resetSleepTimer();
 }
 
@@ -452,7 +521,7 @@ function sendSurprise(){
 	fd.append('file',recordedBlob);
 	fd.append('send_name',$('#_input_send_name').val());
 	fd.append('send_number',$('#_input_send_phone').val());
-	fd.append('store_id',MACHINE_ID);
+	fd.append('store_id',PARAM.MACHINE_ID);
 
 	
 	_record_qrcode.clear();
@@ -475,7 +544,6 @@ function sendSurprise(){
 			_record_qrcode.makeCode(response.share_url);
 
 			sendSMS($('#_input_send_phone').val(),$('#_input_send_name').val(),_guid);
-
 			goPage('_page_send_success');
 		}
 	});
@@ -513,7 +581,33 @@ function toggleLotteryError(show_,text_){
 		$('#_button_send_lottery').removeClass('Disabled');
 	}
 }
+function checkSendCelebrityInput(){
 
+	var error_text="";
+	if($('#_input_celebrity_name').val().length<1) error_text=error_text+"*姓名不可空白\n";
+
+	var emailRegx=/^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+	var input_email=$('#_input_celebrity_email').val().toLowerCase();
+    if(!emailRegx.test(input_email)) error_text=error_text+"*email錯誤\n";
+
+	var phoneRegx=/^09\d{2}-\d{3}-\d{3}$/;
+	var input_phone=$('#_input_celebrity_phone').val();
+	if(input_phone.length<12 || (!phoneRegx.test(input_phone))) error_text=error_text+"*手機號碼錯誤";
+
+	toggleCelebrityError(error_text.length>0,error_text);
+
+	return error_text.length==0;
+}
+function toggleCelebrityError(show_,text_){
+	if(show_){
+		$('#_error_send_celebrity').text(text_);
+		$('#_error_send_celebrity').removeClass('hidden');
+		$('#_button_send_celebrity').addClass('Disabled');
+	}else{
+		$('#_error_send_celebrity').addClass('hidden');
+		$('#_button_send_celebrity').removeClass('Disabled');
+	}
+}
 function sendTicketInfo(){
 
 	if(!checkSendLotteryInput()){
@@ -543,10 +637,43 @@ function sendTicketInfo(){
 		},
 		success:function(response){
 			console.log(response);
+			sendJandiLog('ticket info sent!');
 			goPage('_page_lottery_success');
 		}
 	});
 
+}
+
+function sendCelebrityInfo(){
+	if(!checkSendCelebrityInput()){
+		playSound('error');
+		return;
+	}
+	playSound('click');
+	var fd=new FormData();
+	fd.append('action','ticketInfo');
+	fd.append('guid',_guid);
+	fd.append('name',$('#_input_celebrity_name').val());
+	fd.append('email',$('#_input_celebrity_email').val());
+	fd.append('phone',$('#_input_celebrity_phone').val());
+	fd.append('watched_video',_video_watched);
+
+	$.ajax({
+		url:'https://mmlab.com.tw/project/surprisegenerator/backend/action.php',
+		type:'POST',
+		data:fd,
+		processData: false,
+		contentType: false,
+		cache:false,
+		error:function(xhr){
+			console.log('something went wrong...');
+		},
+		success:function(response){
+			console.log(response);
+			sendJandiLog('ticket info sent!');
+			goPage('_page_lottery_success');
+		}
+	});
 }
 
 function loadVideo(){
@@ -559,7 +686,7 @@ function loadVideo(){
 
 	var fd=new FormData();
 	fd.append('action','loadVideo');
-	fd.append('store_id',MACHINE_ID);
+	fd.append('store_id',PARAM.MACHINE_ID);
 	fd.append('guid',$('#_input_watch_code').val());
 
 	_video_guid=$('#_input_watch_code').val();
@@ -584,8 +711,12 @@ function loadVideo(){
 			console.log(response);
 			if(response.result==='success'){
 				
-				//setWatchedVideo($('#_input_watch_code').val());
+				if(response.celebrity==='1'){
+					_video_watched_is_celebrity=true;
+				}else _video_watched_is_celebrity=false;
 
+				//setWatchedVideo($('#_input_watch_code').val());
+				sendJandiLog("load video "+response.video_url);
 				setloadingVideo(response.video_url);
 				_watch_qrcode.makeCode(response.share_url);
 			}else{
@@ -626,11 +757,7 @@ function loadingFrameUpdate(e,data){
 		$('#_video_watching')[0].pause();
 		$('#_video_watching')[0].currentFrame='0';
 
-		turnOffBgm();
-		setTimeout(function(){		
-			$('#_video_watching')[0].play();
-			$('#_video_watching')[0].muted=false;
-		},VIDEO_DELAY);
+		turnOffBgm();		
 
 		$('#_video_watching')[0].loop=false;		
 	}
@@ -644,20 +771,26 @@ function pad(num, size) {
 function updateWatchProgress(){
 	var cur_time=$('#_video_watching')[0].currentTime;
 	var total_time=recordingTimeMS/1000;//$('#_video_watching')[0].duration;
-	var len=cur_time/total_time*810.0;
-
-	$('#_progress_video_watch').css('width',len);
+	var percent=Math.min(cur_time/total_time*100.0,100);
+	
+	
+	//$('#_progress_video_watch').css('width',len);
+	$('#_progress_video_watch').val(percent);
+	$('#_progress_video_watch_track').val(Math.min(Math.max(percent-2,0),100));
 	$('#_time_video_watch').text('00:'+pad(Math.round(cur_time),2));
 
 }
 function changeWatchProgress(e){
-	var offset=$(this).offset();
-    var left=(e.pageX-offset.left);
-    var percentage=(left/810.0);
+	// var offset=$(this).offset();
+ //    var left=(e.pageX-offset.left);
+    //var percentage=(left/810.0);
+    var percentage=$('#_progress_video_watch').val()/100.0;
     var vidTime=recordingTimeMS/1000*percentage;
 	
 	$('#_video_watching')[0].currentTime=vidTime;
 	$('#_video_watching')[0].play();
+
+	$('#_progress_video_watch_track').val(percentage);
 }
 
 function onWatchVideoFinish(){
@@ -673,20 +806,22 @@ function onWatchVideoFinish(){
 function updatePreviewProgress(){
 	var cur_time=$('#_video_preview')[0].currentTime;
 	var total_time=recordingTimeMS/1000;//$('#_video_watching')[0].duration;
-	var len=cur_time/total_time*810.0;
+	var percent=Math.min(cur_time/total_time*100.0,100);
+	var len=Math.min(cur_time/total_time*810.0,810);
 
-	$('#_progress_video_preview').css('width',len);
+	$('#_progress_video_preview').val(percent);
+	$('#_progress_video_preview_track').val(Math.min(Math.max(percent-2,0),100));
 	$('#_time_video_preview').text('00:'+pad(Math.round(cur_time),2));
 
 }
 function changePreviewProgress(e){
-	var offset=$(this).offset();
-    var left=(e.pageX-offset.left);
-    var percentage=(left/810.0);
+	var percentage=$('#_progress_video_preview').val()/100.0;
     var vidTime=recordingTimeMS/1000*percentage;
 	
 	$('#_video_preview')[0].currentTime=vidTime;
 	$('#_video_preview')[0].play();
+
+	$('#_progress_video_preview_track').val(percentage);
 }
 
 function openKeyboarad(){
@@ -752,9 +887,11 @@ function showItem(item_){
 }
 
 function checkWatchedVideo(){
-	if(getTimeFromNow(_video_watched_time)>GAP_WATCH_RECORD){
+	var diff=getTimeFromNow(_video_watched_time);
+	if(diff>GAP_WATCH_RECORD){
 		_video_watched="";
 		_video_watched_time=new Date();
+		_video_watched_is_celebrity=0;
 	}
 }
 function setWatchedVideo(id_){
@@ -767,7 +904,7 @@ function getTimeFromNow(date_){
 
 	var oToday=new Date();
 	var nDiff=oToday.getTime()-date_.getTime();
-	return Math.floor(nDiff/1000);
+	return nDiff;
 }
 
 function clearSleepTimer(){
@@ -800,10 +937,29 @@ function sendLight(type_){
 }
 
 
-// TODO:
 function sendSMS(phone_,name_,guid_){
+
+	if(!SEND_SMS) return;
 
 	phone_=phone_.split('-').join('');
 	_websocket.send('sms|'+phone_+'|'+name_+'|'+guid_);
+	sendJandiLog('send sms: '+phone_);
+}
 
+function sendJandiLog(message_){
+
+	var data_='{"body":"['+PARAM.MACHINE_ID+'] '+message_+'"}';
+	console.log(data_);
+	$.ajax({
+		url:'https://wh.jandi.com/connect-api/webhook/14606752/6f707d68c6bc89e0ae59cc0ce5e7d0ac',
+		type:'POST',
+		data:data_,
+		contentType: 'application/json',
+		error:function(xhr){
+			console.log('something went wrong...');			
+		},
+		success:function(response){
+			console.log(response);			
+		}
+	});
 }

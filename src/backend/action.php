@@ -44,6 +44,15 @@
 
 	    imagedestroy($base_image);
     }
+	function checkDuplicateID($sql_,$id_){
+    	
+    	$cmd='SELECT * FROM user_data WHERE id='.$id_;
+		
+		$result=$sql_->query($cmd);							
+		
+		if($result->num_rows>0) return true;
+		return false;
+    }
 	
 	$share_url='https://mmlab.com.tw/project/surprisegenerator/backend/direct.php?id=';
 	$video_url='https://mmlab.com.tw/project/surprisegenerator/backend/video/';
@@ -69,7 +78,10 @@
 					$json['result']='fail: file error';
 				}else{
 					
-					$guid=random_strings($idlength);					
+
+					$guid=random_strings($idlength);		
+					while(checkDuplicateID($conn,$guid)) $guid=random_strings($idlength);
+
 					// TODO: check unique!!!
 					//$path=$video_folder.$guid.$video_type;					
 					move_uploaded_file($_FILES['file']['tmp_name'],'./video/'.$guid.$video_type);					
@@ -147,4 +159,6 @@
 
 	}
 	$conn->close();
+
+
 ?>
