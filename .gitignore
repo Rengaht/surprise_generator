@@ -22,3 +22,4 @@ $RECYCLE.BIN/
 # Operating System Files
 # =========================
 src/node/node_modules/
+src/backend/output/

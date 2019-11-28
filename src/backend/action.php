@@ -99,7 +99,7 @@
 				break;
 			case 'loadVideo':
 			
-				$cmd='SELECT * from user_data WHERE id="'.$_POST['guid'].'"';
+				$cmd='SELECT * from user_data WHERE id="'.strtoupper($_POST['guid']).'"';
 				$result=$conn->query($cmd);
 		
 				if($result->num_rows>0){
@@ -108,10 +108,10 @@
 						$json['celebrity']=$row['celebrity'];
 					}
 					
-					if(file_exists('./video/'.$_POST['guid'].$video_type)){
+					if(file_exists('./video/'.strtoupper($_POST['guid']).$video_type)){
 						$json['result']='success';
-						$json['video_url']=$video_url.$_POST['guid'].$video_type;
-						$json['share_url']=$share_url.$_POST['guid'];
+						$json['video_url']=$video_url.strtoupper($_POST['guid']).$video_type;
+						$json['share_url']=$share_url.strtoupper($_POST['guid']);						
 
 						$log='INSERT INTO video_record (video_id,store) VALUES ("'.$_POST['guid'].'","'.$_POST['store_id'].'")';
 						if($conn->query($log)===TRUE){
